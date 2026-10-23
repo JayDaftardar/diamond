@@ -1,0 +1,22 @@
+# Secrets: real values live in .env files, never in git. Only .env.example is committed.
+.env
+.env.*
+!.env.example
+
+# Dependencies and build output
+node_modules/
+.venv/
+dist/
+.output/
+.tanstack/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+
+# Local tooling and scratch
+.taste-skill/
+.agents/
+.claude/
+*.log
+.DS_Store

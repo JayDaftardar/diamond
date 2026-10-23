@@ -1,0 +1,94 @@
+/*
+ * Design tokens. Every value on the site comes from here.
+ *
+ * Palette: exactly the six brand colours. Other shades are tints of Deep Navy (opacity
+ * mixes), so no seventh hue ever appears.
+ *
+ * Contrast (WCAG 2.2), computed:
+ *   navy on white 10.4 | navy on soft gray 9.4 | white on navy 10.4 | white on red 4.8
+ *   navy on brand blue 3.7 and navy on cyan 4.2 -> large/bold text only (19px bold)
+ *   white on brand blue 2.8, white on cyan 2.5 -> never used for text
+ *   brand blue / cyan on white are below 3:1 -> fills and hover only, never the sole
+ *   signal of a state and never an input border.
+ */
+
+/* Fonts: Martel (display) and Mukta (text). Both ship Devanagari, so Marathi can be added
+   later without changing typefaces. */
+@import '@fontsource/martel/latin-800.css';
+@import '@fontsource/mukta/latin-400.css';
+@import '@fontsource/mukta/latin-600.css';
+@import '@fontsource/mukta/latin-700.css';
+
+:root {
+  /* ---- Colour ---- */
+  --c-brand: #5d9cec; /* main buttons, current-page mark in the nav */
+  --c-ink: #1e3a8a; /* all text, headings, dark fields, focus ring */
+  --c-emergency: #dc2626; /* emergency elements and error text ONLY */
+  --c-accent: #00b4d8; /* hover states, secondary buttons */
+  --c-surface: #ffffff; /* page ground */
+  --c-surface-2: #f3f4f6; /* second ground: fields and quiet panels */
+
+  /* 6.8:1 on white: secondary notes only; running text stays in full ink. */
+  --c-ink-muted: color-mix(in srgb, var(--c-ink) 85%, transparent);
+  /* About 3.5:1 on white: input borders, and the dimmed names in the insurer sentence
+     (large text, where 3:1 is the requirement). */
+  --c-ink-dim: color-mix(in srgb, var(--c-ink) 60%, transparent);
+  --c-on-ink-muted: color-mix(in srgb, #fff 82%, transparent);
+
+  /* ---- Type: two faces, five sizes ---- */
+  --font-display: 'Martel', Georgia, 'Times New Roman', serif;
+  --font-text: 'Mukta', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --fs-display: clamp(
+    2.25rem,
+    9vw,
+    9.5rem
+  ); /* 40-168px: the hero sentence, the footer number */
+  --fs-heading: clamp(
+    2.25rem,
+    4.5vw,
+    4.25rem
+  ); /* 36-68px: page and section headings */
+  --fs-statement: clamp(
+    1.375rem,
+    2.4vw,
+    2.125rem
+  ); /* 22-34px: statements, sub-headings */
+  --fs-body: 1.1875rem; /* 19px: text and buttons (navy on blue needs 19px bold) */
+  --fs-small: 0.9375rem; /* 15px: notes, captions, meta */
+
+  --track-display: -0.035em;
+  --lead-display: 1;
+  --lead-heading: 1.05;
+  --lead-statement: 1.2;
+  --lead-body: 1.55;
+
+  /* ---- Space: one pair of margins, one grid ---- */
+  --margin: clamp(1rem, 2.2vw, 2rem); /* 16-32px */
+  --gutter: clamp(0.75rem, 1.4vw, 1.5rem);
+  --section: clamp(3rem, 6vw, 5rem); /* 48-80px between sections */
+  --measure: 62ch;
+
+  --s-1: 0.25rem;
+  --s-2: 0.5rem;
+  --s-3: 0.75rem;
+  --s-4: 1rem;
+  --s-5: 1.5rem;
+  --s-6: 2rem;
+  --s-7: 3rem;
+  --s-8: 4.5rem;
+
+  /* One corner radius for buttons, cards, photographs and fields. */
+  --radius: 8px;
+
+  --mobile-bar-h: 3.75rem; /* sticky emergency bar on phones */
+
+  /* ---- Motion ---- */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.76, 0, 0.24, 1);
+  --ease-soft: cubic-bezier(0.33, 1, 0.68, 1);
+  --t-press: 140ms;
+  --t-hover: 180ms;
+  --t-ui: 240ms;
+  --t-reveal: 800ms;
+}

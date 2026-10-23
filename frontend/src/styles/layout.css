@@ -1,0 +1,334 @@
+/* Site chrome: header, menu, emergency bar, footer. Plain furniture: no bars, no lines. */
+
+/* ---------------- Header: wordmark, four links, one action ---------------- */
+
+.site-header__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-5);
+  padding-block: var(--s-4);
+}
+
+.wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-3);
+  color: var(--c-ink);
+  text-decoration: none;
+}
+.wordmark__mark {
+  width: 2.25rem;
+  height: 2.25rem;
+  flex: none;
+  transition: transform var(--t-ui) var(--ease-out);
+}
+.wordmark:hover .wordmark__mark {
+  transform: rotate(45deg);
+}
+.wordmark__text {
+  display: grid;
+  line-height: 1.15;
+}
+.wordmark__name {
+  font-family: var(--font-display);
+  font-size: var(--fs-body);
+  font-weight: 800;
+  white-space: nowrap;
+}
+.wordmark__place {
+  font-size: var(--fs-small);
+  color: var(--c-ink-muted);
+}
+
+.site-nav {
+  display: none;
+}
+.site-nav ul {
+  display: flex;
+  gap: var(--s-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.site-nav a {
+  display: block;
+  padding-block: var(--s-2);
+  font-weight: 600;
+  text-decoration-line: underline;
+  text-decoration-thickness: 4px;
+  text-underline-offset: 0.4em;
+  text-decoration-color: transparent;
+}
+.site-nav a:hover {
+  text-decoration-color: var(--c-accent);
+}
+/* Current page: bold, with the brand-blue mark under it. */
+.site-nav a[aria-current='page'] {
+  font-weight: 700;
+  text-decoration-color: var(--c-brand);
+}
+
+.site-header__call {
+  display: none;
+}
+.call-label {
+  display: grid;
+  line-height: 1.1;
+  text-align: left;
+}
+.call-label small {
+  font-size: var(--fs-small);
+  font-weight: 600;
+}
+
+.menu-button {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-height: 3rem;
+  padding: 0 var(--s-4);
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--c-surface-2);
+  color: var(--c-ink);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background-color var(--t-hover) ease,
+    transform var(--t-press) var(--ease-out);
+}
+.menu-button:hover {
+  background: var(--c-accent);
+}
+.menu-button:active {
+  transform: scale(0.97);
+}
+.menu-button svg {
+  width: 1.4rem;
+  height: 1.4rem;
+}
+
+/* Narrow phones (360px): keep the name on one line next to the menu button. */
+@media (max-width: 24rem) {
+  .wordmark {
+    gap: var(--s-2);
+  }
+  .wordmark__mark {
+    width: 2rem;
+    height: 2rem;
+  }
+  .wordmark__place {
+    display: none;
+  }
+}
+
+/* ---------------- Menu sheet (native <dialog>: focus trap and Esc for free) ---------------- */
+
+.mobile-nav {
+  margin: 0 0 0 auto;
+  width: min(24rem, 100%);
+  height: 100dvh;
+  max-height: none;
+  padding: 0;
+  border: 0;
+  background: var(--c-surface);
+  color: var(--c-ink);
+}
+.mobile-nav::backdrop {
+  background: color-mix(in srgb, var(--c-ink) 55%, transparent);
+}
+.mobile-nav[open] {
+  display: flex;
+  flex-direction: column;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .mobile-nav[open] {
+    animation: sheet-in var(--t-ui) var(--ease-out);
+  }
+  .mobile-nav[open]::backdrop {
+    animation: fade-in var(--t-ui) ease;
+  }
+}
+@keyframes sheet-in {
+  from {
+    transform: translateX(2.5rem);
+    opacity: 0;
+  }
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+.mobile-nav__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--s-3) var(--margin);
+  background: var(--c-surface-2);
+  font-family: var(--font-display);
+  font-weight: 800;
+}
+.mobile-nav ul {
+  margin: 0;
+  padding: var(--s-4) 0;
+  list-style: none;
+}
+.mobile-nav li a {
+  display: block;
+  padding: var(--s-3) var(--margin);
+  font-family: var(--font-display);
+  font-size: var(--fs-statement);
+  font-weight: 800;
+  text-decoration: none;
+  transition: background-color var(--t-hover) ease;
+}
+.mobile-nav li a:hover {
+  background: var(--c-surface-2);
+}
+.mobile-nav li a[aria-current='page'] {
+  text-decoration: underline 4px var(--c-brand);
+  text-underline-offset: 0.3em;
+}
+.mobile-nav__contact {
+  margin-top: auto;
+  padding: var(--margin);
+  background: var(--c-surface-2);
+  display: grid;
+  gap: var(--s-3);
+}
+
+/* ---------------- Emergency bar (phones and tablets) ---------------- */
+
+.emergency-bar {
+  position: fixed;
+  inset: auto 0 0 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+  min-height: var(--mobile-bar-h);
+  padding: var(--s-2) var(--margin)
+    calc(var(--s-2) + env(safe-area-inset-bottom));
+  background: var(--c-emergency);
+  color: #fff;
+}
+.emergency-bar__text {
+  display: grid;
+  line-height: 1.2;
+  font-weight: 700;
+}
+.emergency-bar__text small {
+  font-size: var(--fs-small);
+  font-weight: 600;
+}
+/* Slides out of the way while the footer's large number is on screen. */
+.emergency-bar {
+  transition: transform var(--t-ui) var(--ease-out);
+}
+.emergency-bar.is-away {
+  transform: translateY(110%);
+}
+.emergency-bar .btn {
+  min-height: 2.75rem;
+  padding: 0 var(--s-4);
+  background: #fff;
+  color: var(--c-ink);
+}
+.emergency-bar .btn:hover {
+  background: var(--c-surface-2);
+}
+.emergency-bar :focus-visible {
+  outline-color: #fff;
+}
+
+/* ---------------- Footer ---------------- */
+
+.site-footer {
+  background: var(--c-ink);
+  color: #fff;
+  padding-top: var(--s-8);
+}
+.site-footer a {
+  color: #fff;
+}
+.site-footer__grid {
+  display: grid;
+  gap: var(--s-7);
+}
+.site-footer h2,
+.site-footer h3 {
+  margin-bottom: var(--s-3);
+  color: #fff;
+}
+.site-footer__name {
+  font-size: var(--fs-statement);
+}
+.site-footer h3 + p,
+.site-footer address {
+  margin-bottom: var(--s-3);
+}
+.site-footer__muted {
+  margin-bottom: var(--s-4);
+  font-size: var(--fs-small);
+  color: var(--c-on-ink-muted);
+}
+.site-footer__list {
+  display: grid;
+  gap: var(--s-2);
+  margin: 0 0 var(--s-5);
+  padding: 0;
+  list-style: none;
+}
+.site-footer__map {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border: 0;
+  border-radius: var(--radius);
+  background: color-mix(in srgb, #fff 10%, var(--c-ink));
+}
+.site-footer__base {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--s-3);
+  margin-top: var(--s-8);
+  padding-block: var(--s-5);
+  font-size: var(--fs-small);
+  color: var(--c-on-ink-muted);
+}
+
+/* ---------------- Tablet ---------------- */
+
+@media (min-width: 48rem) {
+  .site-footer__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ---------------- Desktop ---------------- */
+
+@media (min-width: 64rem) {
+  body {
+    padding-bottom: 0;
+  }
+  .site-nav,
+  .site-header__call {
+    display: block;
+  }
+  .site-header__call {
+    display: inline-flex;
+  }
+  .menu-button,
+  .mobile-nav,
+  .emergency-bar {
+    display: none !important;
+  }
+  .site-footer__grid {
+    grid-template-columns: 1.3fr 1fr 0.8fr 1.5fr;
+  }
+}

@@ -1,0 +1,264 @@
+"""Admin API request/response shapes. Validators run the security checks, so a bad
+YouTube link, presentation link or slug is reported against the field that caused it."""
+
+import re
+from datetime import datetime
+from typing import Annotated
+
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints, field_validator
+
+from app.services import embeds, youtube
+from app.services.sanitize import MAX_HTML_LENGTH, clean_html
+from app.services.slugs import SLUG_MESSAGE, SLUG_PATTERN
+
+PHOTO_PATTERN = r"^[a-z0-9-]+\.(webp|jpg|jpeg|png)$"
+
+Text = Annotated[str, StringConstraints(strip_whitespace=True)]
+
+
+def _blank_to_none(value: str | None) -> str | None:
+    return value.strip() or None if isinstance(value, str) else None
+
+
+class _Out(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+
+class _SlugMixin(BaseModel):
+    slug: str | None = Field(None, max_length=120)
+
+    @field_validator("slug", mode="before")
+    @classmethod
+    def _slug(cls, v):
+        v = _blank_to_none(v)
+        if v is not None and not re.fullmatch(SLUG_PATTERN, v):
+            raise ValueError(SLUG_MESSAGE)
+        return v
+
+
+# ------------------------------------------------------------------ auth
+
+
+class LoginIn(BaseModel):
+    email: str = Field(max_length=254)
+    password: str = Field(max_length=200)
+
+
+class AdminOut(_Out):
+    id: int
+    email: str
+
+
+# ------------------------------------------------------------- dashboard
+
+
+class TreatmentCounts(BaseModel):
+    total: int
+    public: int
+    draft: int
+    hidden: int
+
+
+class VisibilityCounts(BaseModel):
+    total: int
+    public: int
+    hidden: int
+
+
+class DashboardOut(BaseModel):
+    unread_submissions: int
+    total_submissions: int
+    treatments: TreatmentCounts
+    doctors: VisibilityCounts
+    departments: VisibilityCounts
+
+
+# ----------------------------------------------------------- submissions
+
+
+class SubmissionOut(_Out):
+    id: int
+    name: str
+    phone: str
+    email: str | None
+    message: str
+    is_read: bool
+    created_at: datetime
+
+
+class SubmissionPage(BaseModel):
+    items: list[SubmissionOut]
+    total: int
+    unread_total: int
+    page: int
+    page_size: int
+
+
+class SubmissionPatch(BaseModel):
+    is_read: bool
+
+
+# ----------------------------------------------------------- departments
+
+
+class DepartmentIn(_SlugMixin):
+    name: Text = Field(min_length=2, max_length=160)
+    summary: str | None = Field(None, max_length=300)
+    intro_html: str | None = Field(None, max_length=MAX_HTML_LENGTH)
+    is_hidden: bool = False
+
+    @field_validator("summary", mode="before")
+    @classmethod
+    def _summary(cls, v):
+        return _blank_to_none(v)
+
+    @field_validator("intro_html")
+    @classmethod
+    def _intro(cls, v):
+        return clean_html(v)
+
+
+class DepartmentOut(_Out):
+    id: int
+    slug: str
+    name: str
+    summary: str | None
+    intro_html: str | None
+    sort_order: int
+    is_hidden: bool
+    treatment_count: int
+    updated_at: datetime
+
+
+class ReorderIn(BaseModel):
+    ids: list[int]
+
+
+class VisibilityIn(BaseModel):
+    is_hidden: bool
+
+
+# --------------------------------------------------------------- doctors
+
+
+class DoctorIn(_SlugMixin):
+    name: Text = Field(min_length=2, max_length=160)
+    designation: Text = Field(min_length=2, max_length=200)
+    speciality: Text = Field(min_length=2, max_length=200)
+    qualifications: str | None = Field(None, max_length=1000)
+    training: str | None = Field(None, max_length=2000)  # one item per line
+    achievements: str | None = Field(None, max_length=2000)  # one item per line
+    expertise: list[
+        Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=100)]
+    ] = Field(default_factory=list, max_length=30)
+    opd_timings: str | None = Field(None, max_length=300)
+    photo_filename: str | None = Field(None, max_length=120)
+    department_ids: list[int] = Field(min_length=1, max_length=14)
+    primary_department_id: int | None = None
+    sort_order: int | None = None
+    is_hidden: bool = False
+
+    @field_validator("qualifications", "training", "achievements", "opd_timings", mode="before")
+    @classmethod
+    def _optional_text(cls, v):
+        return _blank_to_none(v)
+
+    @field_validator("photo_filename", mode="before")
+    @classmethod
+    def _photo(cls, v):
+        v = _blank_to_none(v)
+        if v is not None and not re.fullmatch(PHOTO_PATTERN, v):
+            raise ValueError(
+                "Use the photo's file name only, in lowercase, ending in .webp, .jpg or .png."
+            )
+        return v
+
+
+class DoctorOut(_Out):
+    id: int
+    slug: str
+    name: str
+    designation: str
+    speciality: str
+    qualifications: str | None
+    training: str | None
+    achievements: str | None
+    expertise: list[str]
+    opd_timings: str | None
+    photo_filename: str | None
+    department_ids: list[int]
+    primary_department_id: int | None
+    sort_order: int
+    is_hidden: bool
+    updated_at: datetime
+
+
+# ------------------------------------------------------------ treatments
+
+
+class TreatmentIn(_SlugMixin):
+    title: Text = Field(min_length=2, max_length=200)
+    department_id: int
+    description_html: str | None = Field(None, max_length=MAX_HTML_LENGTH)
+    youtube_url: str | None = Field(None, max_length=300)
+    presentation_url: str | None = Field(None, max_length=1000)
+    doctor_ids: list[int] = Field(default_factory=list, max_length=20)
+    is_hidden: bool = False
+
+    @field_validator("description_html")
+    @classmethod
+    def _description(cls, v):
+        return clean_html(v)  # None when only empty markup is left, which keeps it a draft
+
+    @field_validator("youtube_url", mode="before")
+    @classmethod
+    def _youtube(cls, v):
+        v = _blank_to_none(v)
+        if v is not None:
+            youtube.extract_video_id(v)  # raises ValueError with an admin-friendly message
+        return v
+
+    @field_validator("presentation_url", mode="before")
+    @classmethod
+    def _presentation(cls, v):
+        v = _blank_to_none(v)
+        return embeds.validate_presentation_url(v)[0] if v is not None else None
+
+
+class DepartmentRefOut(_Out):
+    id: int
+    slug: str
+    name: str
+
+
+class TreatmentOut(BaseModel):
+    id: int
+    slug: str
+    title: str
+    department: DepartmentRefOut
+    description_html: str | None
+    youtube_video_id: str | None
+    youtube_url: str | None
+    presentation_url: str | None
+    presentation_provider: str | None
+    doctor_ids: list[int]
+    is_hidden: bool
+    status: str  # public | draft | hidden
+    updated_at: datetime
+
+
+class TreatmentListItem(BaseModel):
+    id: int
+    slug: str
+    title: str
+    department: DepartmentRefOut
+    is_hidden: bool
+    status: str
+    updated_at: datetime
+
+
+class TreatmentPage(BaseModel):
+    items: list[TreatmentListItem]
+    total: int
+    page: int
+    page_size: int

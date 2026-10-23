@@ -1,0 +1,217 @@
+/* Home page: hero, emergency panel, Ayushman and insurers, facilities, contact band. */
+
+/* ---------------- Hero: photo, name, actions ---------------- */
+
+.hero {
+  padding-block: var(--s-6) var(--s-8);
+}
+.hero__grid {
+  display: grid;
+  gap: var(--s-6);
+  align-items: center;
+}
+.hero__photo {
+  order: -1; /* phones: the photo comes first */
+}
+.hero__photo .photo {
+  border-radius: var(--radius);
+}
+.hero__text h1 {
+  font-size: clamp(2.25rem, 3.6vw, 3.5rem);
+}
+.hero__venture {
+  margin-top: var(--s-3);
+  font-weight: 600;
+  color: var(--c-ink-muted);
+}
+.hero__lead {
+  margin-top: var(--s-5);
+  font-size: var(--fs-statement);
+  line-height: var(--lead-statement);
+  max-width: 34ch;
+}
+.hero__text .button-row {
+  margin-top: var(--s-6);
+}
+
+/* ---------------- Emergency panel: the three numbers, one tap each ---------------- */
+
+.emergency-panel {
+  display: grid;
+  gap: var(--s-5);
+  margin-top: var(--s-7);
+  padding: var(--s-6) var(--s-5);
+  border-radius: var(--radius);
+  background: var(--c-emergency);
+  color: #fff;
+}
+.emergency-panel__title {
+  font-size: var(--fs-statement);
+  color: #fff;
+}
+.emergency-panel p {
+  margin-top: var(--s-1);
+  font-weight: 600;
+}
+.emergency-panel__numbers {
+  display: grid;
+  gap: var(--s-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.emergency-panel__numbers a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-3);
+  min-height: 3.5rem;
+  padding: 0 var(--s-5);
+  border-radius: var(--radius);
+  background: #fff;
+  color: var(--c-ink);
+  font-size: var(--fs-statement);
+  font-weight: 700;
+  text-decoration: none;
+  transition:
+    background-color var(--t-hover) ease,
+    transform var(--t-press) var(--ease-out);
+}
+.emergency-panel__numbers a:hover {
+  background: var(--c-surface-2);
+}
+.emergency-panel__numbers a:active {
+  transform: scale(0.98);
+}
+.emergency-panel__numbers svg {
+  width: 1.3rem;
+  height: 1.3rem;
+}
+.emergency-panel :focus-visible {
+  outline-color: #fff;
+}
+
+/* ---------------- Ayushman Bharat and insurers ---------------- */
+
+.cover-grid {
+  display: grid;
+  gap: var(--s-6);
+  align-items: start;
+}
+.ayushman-panel {
+  display: grid;
+  gap: var(--s-4);
+  padding: var(--s-6) var(--s-5);
+  border-radius: var(--radius);
+  background: var(--c-ink);
+  color: #fff;
+}
+.ayushman-panel h3 {
+  font-family: var(--font-display);
+  font-size: var(--fs-statement);
+  font-weight: 800;
+}
+.ayushman-panel a {
+  color: #fff;
+}
+.ayushman-panel :focus-visible {
+  outline-color: #fff;
+}
+.cover-grid__title {
+  margin-bottom: var(--s-4);
+}
+
+/* ---------------- Facilities ---------------- */
+
+.facility-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--s-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.facility-grid li {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  min-height: 3.5rem;
+  padding: var(--s-3) var(--s-4);
+  border-radius: var(--radius);
+  background: var(--c-surface-2);
+  font-weight: 600;
+  line-height: 1.3;
+}
+/* A small brand-blue square marks each item (decorative; the text carries the meaning). */
+.facility-grid li::before {
+  content: '';
+  flex: none;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 2px;
+  background: var(--c-brand);
+}
+
+/* ---------------- Contact call-to-action ---------------- */
+
+.cta-band {
+  padding-block: var(--s-8);
+  background: var(--c-surface-2);
+  color: var(--c-ink);
+}
+.cta-band__inner {
+  display: grid;
+  gap: var(--s-5);
+  align-items: center;
+}
+.cta-band h2 {
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+}
+.cta-band p {
+  margin-top: var(--s-3);
+  color: var(--c-ink-muted);
+  font-size: var(--fs-statement);
+  line-height: var(--lead-statement);
+}
+
+/* ---------------- Tablet ---------------- */
+
+@media (min-width: 48rem) {
+  .emergency-panel__numbers {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .facility-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ---------------- Desktop ---------------- */
+
+@media (min-width: 64rem) {
+  .hero {
+    padding-block: var(--s-7) var(--s-8);
+  }
+  .hero__grid {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--s-8);
+  }
+  .hero__photo {
+    order: 0; /* desktop: text left, photo right */
+  }
+  .emergency-panel {
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: var(--s-7);
+    padding: var(--s-6);
+  }
+  .cover-grid {
+    grid-template-columns: 5fr 7fr;
+    gap: var(--s-7);
+  }
+  .facility-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .cta-band__inner {
+    grid-template-columns: 1fr auto;
+  }
+}
