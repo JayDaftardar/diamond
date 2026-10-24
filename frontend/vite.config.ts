@@ -4,6 +4,8 @@ import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 
 import viteReact from '@vitejs/plugin-react'
 
+import tailwindcss from '@tailwindcss/vite'
+
 export default defineConfig(({ mode }) => {
   // Server-only settings (no VITE_ prefix, e.g. API_INTERNAL_URL) are read from .env in
   // development so server functions can use process.env. In production the host sets them.
@@ -14,6 +16,6 @@ export default defineConfig(({ mode }) => {
 
   return {
     resolve: { tsconfigPaths: true },
-    plugins: [tanstackStart(), viteReact()],
+    plugins: [tailwindcss(), tanstackStart(), viteReact()],
   }
 })

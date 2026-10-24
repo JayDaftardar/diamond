@@ -1,7 +1,106 @@
-@import './tokens.css';
-@import './base.css';
-@import './ui.css';
-@import './layout.css';
-@import './pages.css';
-@import './home.css';
-@import './admin.css';
+/*
+ * Site stylesheet: Tailwind CSS v4 with the Diamond Hospital design tokens.
+ *
+ * During the redesign the previous stylesheets live in ./legacy and load in their own
+ * layer, placed after Tailwind's reset and before its utilities: pages not yet redesigned
+ * keep their look, and Tailwind classes always win where both apply. Each page's legacy
+ * rules are deleted once that page is redesigned.
+ */
+@layer theme, base, legacy, components, utilities;
+
+@import 'tailwindcss';
+@import './legacy/index.css' layer(legacy);
+
+/* Fonts, self-hosted. Domine for headings, Source Serif 4 Italic for the one accent word
+   in a heading, Mukta for everything else (Mukta and Domine both suit Marathi later). */
+@import '@fontsource/domine/latin-600.css';
+@import '@fontsource/domine/latin-700.css';
+@import '@fontsource/source-serif-4/latin-600-italic.css';
+@import '@fontsource/mukta/latin-500.css';
+
+@theme {
+  /* ---- Fonts: only ours ---- */
+  --font-*: initial;
+  --font-heading: 'Domine', Georgia, 'Times New Roman', serif;
+  --font-accent: 'Source Serif 4', Georgia, serif;
+  --font-body: 'Mukta', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --default-font-family: var(--font-body);
+
+  /* ---- Colour: the token sheet and nothing else, so off-brand colours can't be used ---- */
+  --color-*: initial;
+  --color-white: #ffffff;
+  --color-navy-950: #0a192f; /* headings, footer, dark sections */
+  --color-navy-900: #0f2744;
+  --color-navy-800: #172a45;
+  --color-blue-700: #1e40af; /* action hover */
+  --color-blue-600: #1a56db; /* actions, links, the accent word */
+  --color-blue-50: #eff6ff; /* tinted panels and tiles */
+  --color-red-700: #b91c1c; /* emergency hover */
+  --color-red-600: #dc2626; /* emergency and errors only */
+  --color-red-50: #fef2f2;
+  --color-slate-900: #0f172a;
+  --color-slate-700: #334155; /* running text */
+  --color-slate-500: #64748b; /* secondary notes */
+  --color-slate-300: #cbd5e1;
+  --color-slate-200: #e2e8f0; /* borders, dividers */
+  --color-slate-100: #f1f5f9;
+  --color-slate-50: #f8fafc;
+
+  /* ---- Type scale (fluid between phone and desktop) ---- */
+  --text-display: clamp(2.5rem, 1.55rem + 3.9vw, 4.375rem); /* 40 -> 70px, hero */
+  --text-display--line-height: 1.06;
+  --text-display--letter-spacing: -0.02em;
+  --text-h2: clamp(1.875rem, 1.35rem + 2.1vw, 3rem); /* 30 -> 48px, section headings */
+  --text-h2--line-height: 1.12;
+  --text-h2--letter-spacing: -0.015em;
+  --text-h3: clamp(1.1875rem, 1.05rem + 0.5vw, 1.375rem); /* 19 -> 22px */
+  --text-h3--line-height: 1.3;
+  --text-lead: clamp(1.125rem, 1.05rem + 0.3vw, 1.25rem); /* 18 -> 20px */
+  --text-lead--line-height: 1.6;
+  --text-body: 1.0625rem; /* 17px */
+  --text-body--line-height: 1.65;
+  --text-eyebrow: 0.75rem; /* 12px caps labels */
+  --text-eyebrow--line-height: 1.3;
+  --text-eyebrow--letter-spacing: 0.14em;
+
+  /* ---- Depth: three soft, navy-tinted steps ---- */
+  --shadow-*: initial;
+  --shadow-tile: 0 1px 2px rgb(10 25 47 / 0.05), 0 1px 3px rgb(10 25 47 / 0.04);
+  --shadow-card: 0 1px 2px rgb(10 25 47 / 0.04), 0 10px 30px -12px rgb(10 25 47 / 0.14);
+  --shadow-float: 0 2px 6px rgb(10 25 47 / 0.06), 0 28px 56px -16px rgb(10 25 47 / 0.28);
+
+  /* ---- Motion ---- */
+  --ease-*: initial;
+  --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --animate-float-in: float-in 900ms var(--ease-smooth) 450ms both;
+  @keyframes float-in {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+  }
+}
+
+@layer base {
+  html {
+    scroll-padding-top: 6rem; /* room for the sticky header when jumping to a section */
+  }
+  body {
+    background-color: var(--color-white);
+    color: var(--color-slate-700);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection {
+    background-color: var(--color-blue-600);
+    color: var(--color-white);
+  }
+}
+
+/* Movement is optional: people who ask for less get none of it. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-float-in {
+    animation: none;
+  }
+}
