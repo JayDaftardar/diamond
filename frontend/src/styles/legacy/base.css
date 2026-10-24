@@ -19,8 +19,6 @@ body {
   font-size: var(--fs-body);
   line-height: var(--lead-body);
   text-rendering: optimizeLegibility;
-  /* Room for the sticky emergency bar on phones (removed on desktop in layout.css). */
-  padding-bottom: calc(var(--mobile-bar-h) + env(safe-area-inset-bottom));
 }
 
 img,
@@ -136,12 +134,6 @@ main:focus {
   padding-inline: var(--margin);
   max-width: 120rem;
   margin-inline: auto;
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  column-gap: var(--gutter);
 }
 
 .section {

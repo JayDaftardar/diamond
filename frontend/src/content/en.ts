@@ -20,7 +20,7 @@ export const en = {
       'Diamond Hospital in Ramanmala, Kolhapur: 24-hour emergency care, OPD, ICU, Cath Lab and cashless insurance, including Ayushman Bharat (PM-JAY).',
     titleSuffix: 'Diamond Hospital, Kolhapur',
     homeTitle:
-      'Diamond Hospital, Kolhapur | 24�7 Emergency, OPD and Cashless Insurance',
+      'Diamond Hospital, Kolhapur | 24×7 Emergency, OPD and Cashless Insurance',
   },
 
   address: {
@@ -62,6 +62,11 @@ export const en = {
     barLabel: 'Emergency helpline',
     headerLabel: 'Emergency 24×7',
     allNumbers: 'Emergency and enquiries',
+    /** The thin red strip above the header. */
+    stripNumbers: 'Emergency 24×7',
+    stripAyushman: 'Ayushman Bharat PM-JAY empanelled',
+    stripCashless: 'Cashless insurance',
+    stripOpen: 'Open 24 hours, every day',
   },
 
   footer: {
@@ -178,6 +183,35 @@ export const en = {
   },
 
   home: {
+    // Hero: the heading is a statement; the hospital's name leads the paragraph under it.
+    heroEyebrow: 'A venture of Kolhapur Super Speciality Medical Centre',
+    heroTitleStart: 'Advanced treatment,',
+    heroTitleAccent: 'compassionate',
+    heroTitleEnd: 'care.',
+    heroLead:
+      'Diamond Hospital is a multi-speciality hospital in Ramanmala, Kolhapur, next to Mahaveer College. Emergency care, ICU, ICCU, Cath Lab and OPD, open 24 hours.',
+    emergencyCta: 'Emergency {number}',
+    exploreDepartments: 'Explore departments',
+    facts: 'At a glance',
+    factDepartments: 'Specialist departments',
+    factEmergencyValue: '24×7',
+    factEmergency: 'Emergency, ICU and ICCU',
+    factCoverValue: '₹5 lakh',
+    factCover: 'Ayushman Bharat cover',
+    floatTitle: 'Cath Lab, ICU and ICCU',
+    floatText: 'Critical and cardiac care on site',
+    departmentsHeading: 'Specialist care across {count} departments',
+    departmentsLead:
+      'From emergency and critical care to surgery and diagnostics, in one hospital. Choose a department to see its doctors and treatments.',
+    doctorsEyebrow: 'Our doctors',
+    doctorsHeading: 'Meet our specialists',
+    previousDoctors: 'Previous doctors',
+    nextDoctors: 'Next doctors',
+    coverEyebrow: 'PM-JAY empanelled · Cashless',
+    insurersNote: '{count} insurance providers, through empanelled TPAs.',
+    facilitiesLead:
+      'Round-the-clock emergency and critical care, operation theatres, diagnostics, pharmacy and ambulance, all at the hospital.',
+    facilitiesPhotoAlt: 'Front of Diamond Hospital with its name sign, Kolhapur',
     h1: 'Diamond Hospital, Kolhapur',
     lead: 'Multi-speciality hospital in Ramanmala, Kasaba Bawada, next to Mahaveer College. Emergency care, ICU, ICCU and OPD, open 24 hours.',
     callCta: 'Call {number}',
