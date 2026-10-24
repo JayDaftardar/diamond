@@ -73,10 +73,13 @@ export function DoctorCard({
   doctor,
   eager,
   className,
+  headingLevel: Heading = 'h3',
 }: {
   doctor: DoctorCardData
   eager?: boolean
   className?: string
+  /** The doctor's name is a heading: h3 under a section heading, h2 straight under the page's h1. */
+  headingLevel?: 'h2' | 'h3'
 }) {
   return (
     <article
@@ -94,7 +97,7 @@ export function DoctorCard({
         <p className="text-[0.6875rem] leading-snug font-bold tracking-[0.12em] text-blue-600 uppercase">
           {doctor.speciality}
         </p>
-        <h3 className="mt-2 font-heading text-[1.25rem] leading-snug font-semibold text-navy-950">
+        <Heading className="mt-2 font-heading text-[1.25rem] leading-snug font-semibold text-navy-950">
           {/* The link covers the whole card. */}
           <Link
             to="/doctors/$slug"
@@ -103,7 +106,7 @@ export function DoctorCard({
           >
             {doctor.name}
           </Link>
-        </h3>
+        </Heading>
         <p className="mt-1 text-[0.9375rem] leading-snug text-slate-700">
           {doctor.designation}
         </p>
@@ -233,7 +236,13 @@ export function DoctorRow({
 }
 
 /** Doctors in a responsive grid (used on the doctors, department and treatment pages). */
-export function DoctorGrid({ doctors }: { doctors: DoctorCardData[] }) {
+export function DoctorGrid({
+  doctors,
+  headingLevel,
+}: {
+  doctors: DoctorCardData[]
+  headingLevel?: 'h2' | 'h3'
+}) {
   return (
     <ul className="grid list-none gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {doctors.map((doctor, index) => (
@@ -242,7 +251,11 @@ export function DoctorGrid({ doctors }: { doctors: DoctorCardData[] }) {
           data-rise=""
           style={{ '--i': index % 4 } as React.CSSProperties}
         >
-          <DoctorCard doctor={doctor} eager={index < 4} />
+          <DoctorCard
+            doctor={doctor}
+            eager={index < 4}
+            headingLevel={headingLevel}
+          />
         </li>
       ))}
     </ul>

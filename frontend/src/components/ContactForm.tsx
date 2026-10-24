@@ -242,7 +242,7 @@ export function ContactForm() {
 }
 
 const control =
-  'w-full rounded-lg border-0 bg-white px-4 text-[1.0625rem] text-navy-950 ring-1 ring-slate-300 transition placeholder:text-slate-500 hover:ring-slate-400 focus:ring-2 focus:ring-blue-600 focus:outline-none aria-[invalid=true]:ring-2 aria-[invalid=true]:ring-red-600'
+  'w-full rounded-lg border-0 bg-white px-4 text-[1.0625rem] text-navy-950 ring-1 ring-slate-300 transition placeholder:text-slate-500 hover:ring-slate-500 focus:ring-2 focus:ring-blue-600 focus:outline-none aria-[invalid=true]:ring-2 aria-[invalid=true]:ring-red-600'
 
 interface TextFieldProps {
   field: Field
@@ -292,7 +292,7 @@ function TextField({
         {label}
       </label>
       {hint ? (
-        <span className="text-[0.9375rem] text-slate-500" id={`${id}-hint`}>
+        <span className="text-[0.9375rem] text-slate-700" id={`${id}-hint`}>
           {hint}
         </span>
       ) : null}
@@ -316,7 +316,7 @@ function TextField({
       )}
       {error ? (
         <p
-          className="flex items-start gap-2 text-[0.9375rem] font-semibold text-red-600"
+          className="flex items-start gap-2 text-[0.9375rem] font-semibold text-red-700"
           id={`${id}-error`}
         >
           <CircleAlert className="mt-0.5 size-4 shrink-0" aria-hidden="true" />

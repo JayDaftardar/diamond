@@ -13,7 +13,7 @@ export interface Crumb {
 export function Breadcrumbs({ items }: { items: Crumb[] }) {
   return (
     <nav aria-label={m.treatments.breadcrumbs} data-rise="">
-      <ol className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[0.9375rem] text-slate-500">
+      <ol className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[0.9375rem] text-slate-700">
         {items.map((item, index) => (
           <li key={item.label} className="flex items-center gap-1.5">
             {index > 0 ? (

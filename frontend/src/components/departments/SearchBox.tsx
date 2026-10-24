@@ -56,7 +56,7 @@ export function SearchBox({ q, live }: { q: string; live: boolean }) {
           maxLength={100}
           autoComplete="off"
           placeholder={m.departments.searchPlaceholder}
-          className="hover:ring-slate-400 h-12 w-full rounded-lg border-0 bg-white pr-4 pl-12 text-[1.0625rem] text-navy-950 shadow-tile ring-1 ring-slate-300 transition placeholder:text-slate-500 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+          className="h-12 w-full rounded-lg border-0 bg-white pr-4 pl-12 text-[1.0625rem] text-navy-950 shadow-tile ring-1 ring-slate-300 transition placeholder:text-slate-500 hover:ring-slate-500 focus:ring-2 focus:ring-blue-600 focus:outline-none"
           onChange={(event) => {
             setValue(event.target.value)
             if (live) {

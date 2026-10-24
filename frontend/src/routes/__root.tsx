@@ -50,6 +50,16 @@ export const Route = createRootRoute({
  */
 const JS_FLAG = `document.documentElement.classList.add('js');setTimeout(function(){if(!window.__entrances)document.documentElement.classList.remove('js')},4000)`
 
+/**
+ * Reveals what is already on screen the moment the page's HTML has arrived, without waiting
+ * for the app's JavaScript (which can take seconds on a slow phone). Everything below the
+ * fold still waits for Entrances.tsx and appears as it scrolls into view.
+ *
+ * It uses the Web Animations API, not a class: an animation changes no attribute, so React
+ * sees nothing to complain about when it hydrates. Same movement as the CSS in index.css.
+ */
+const REVEAL_VISIBLE = `(function(){var d=document.documentElement;if(!d.classList.contains('js')||matchMedia('(prefers-reduced-motion: reduce)').matches)return;var h=innerHeight*0.92,e='cubic-bezier(.22,1,.36,1)',a=document.querySelectorAll('[data-rise]'),i,r;for(i=0;i<a.length;i++){if(a[i].getBoundingClientRect().top<h){r=parseFloat(getComputedStyle(a[i]).getPropertyValue('--i'))||0;a[i].animate([{opacity:0,transform:'translateY(24px)'},{opacity:1,transform:'none'}],{duration:700,delay:r*80,easing:e,fill:'both'})}}a=document.querySelectorAll('[data-settle]');for(i=0;i<a.length;i++){r=a[i].firstElementChild;if(r&&a[i].getBoundingClientRect().top<h)r.animate([{transform:'scale(1.06)'},{transform:'none'}],{duration:1400,easing:e,fill:'both'})}})()`
+
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
     // The inline JS_FLAG script adds the `js` class before hydration, so the class
@@ -61,6 +71,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         {children}
+        <script dangerouslySetInnerHTML={{ __html: REVEAL_VISIBLE }} />
         <Scripts />
       </body>
     </html>

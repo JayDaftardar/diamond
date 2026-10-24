@@ -40,14 +40,6 @@
   background: var(--c-accent);
 }
 
-.btn--secondary {
-  background: var(--c-accent);
-  color: var(--c-ink);
-}
-.btn--secondary:hover {
-  background: var(--c-brand);
-}
-
 /* Quiet action: a soft field instead of an outline. */
 .btn--quiet {
   background: var(--c-surface-2);
@@ -55,24 +47,6 @@
 }
 .btn--quiet:hover {
   background: var(--c-accent);
-}
-
-/* On the dark band: a white button. */
-.btn--light {
-  background: #fff;
-  color: var(--c-ink);
-}
-.btn--light:hover {
-  background: var(--c-accent);
-}
-
-/* Emergency only. White on red is 4.8:1. */
-.btn--emergency {
-  background: var(--c-emergency);
-  color: #fff;
-}
-.btn--emergency:hover {
-  background: var(--c-ink);
 }
 
 /* A text link that moves: the arrow shifts on hover. */
@@ -89,43 +63,6 @@
 }
 .go:hover svg {
   transform: translateX(4px);
-}
-
-/* ---- Entrances: the parts of a section arrive in reading order, once ----
-   The hidden state only exists under html.js and without reduced motion, so content is
-   always visible when scripts are off. */
-
-@media (prefers-reduced-motion: no-preference) {
-  .js [data-rise] {
-    opacity: 0;
-    transform: translateY(24px);
-    transition:
-      opacity 700ms var(--ease-out),
-      transform 900ms var(--ease-out);
-    transition-delay: calc(var(--i, 0) * 80ms);
-  }
-  .js [data-rise].is-in {
-    opacity: 1;
-    transform: none;
-  }
-
-  /* A picture settles from a slight scale inside its frame. */
-  .js [data-settle] > * {
-    transform: scale(1.06);
-    transition: transform 1400ms var(--ease-soft);
-  }
-  .js [data-settle].is-in > * {
-    transform: none;
-  }
-}
-
-/* Page transitions (View Transitions API, where supported). */
-@media (prefers-reduced-motion: no-preference) {
-  ::view-transition-old(root),
-  ::view-transition-new(root) {
-    animation-duration: 180ms;
-    animation-timing-function: var(--ease-out);
-  }
 }
 
 /* ---- Photographs: square corners; a labelled flat field until the real one exists ---- */
@@ -209,13 +146,4 @@
 .field__hint {
   font-size: var(--fs-small);
   color: var(--c-ink-muted);
-}
-
-/* Honeypot: off-screen for people, present for bots. */
-.hp-field {
-  position: absolute;
-  left: -10000px;
-  width: 1px; /* taste-skill-ignore: a hidden form field, not a rule */
-  height: 1px; /* taste-skill-ignore: a hidden form field, not a rule */
-  overflow: hidden;
 }

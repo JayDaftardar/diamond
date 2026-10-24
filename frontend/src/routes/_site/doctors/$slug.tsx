@@ -102,7 +102,7 @@ function DoctorProfile() {
                 timings={doctor.opd_timings}
                 className="mt-1 block font-semibold text-blue-700"
               />
-              <p className="text-slate-600 mt-3 text-[0.9375rem]">
+              <p className="mt-3 text-[0.9375rem] text-slate-700">
                 {fmt(m.doctors.confirmCall, { number })}
               </p>
               <a

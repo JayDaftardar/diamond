@@ -30,7 +30,7 @@ export function TreatmentList({
                 {treatment.title}
               </span>
               {showDepartment ? (
-                <span className="mt-0.5 block text-[0.9375rem] text-slate-500">
+                <span className="mt-0.5 block text-[0.9375rem] text-slate-700">
                   {treatment.department.name}
                 </span>
               ) : null}

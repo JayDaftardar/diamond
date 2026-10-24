@@ -93,7 +93,10 @@ export function Footer() {
       <Container>
         <div className="flex flex-wrap items-center justify-between gap-4 border-t border-white/10 py-6 text-sm text-white/60">
           <p>{fmt(m.footer.copyright, { year: new Date().getFullYear() })}</p>
-          <a href="#main" className="hover:text-white hover:underline">
+          <a
+            href="#main"
+            className="inline-block py-2 hover:text-white hover:underline"
+          >
             {m.footer.backToTop}
           </a>
         </div>

@@ -90,9 +90,6 @@ a:hover {
   outline: 3px solid var(--c-ink);
   outline-offset: 3px;
 }
-.on-ink :focus-visible {
-  outline-color: #fff;
-}
 main:focus {
   outline: none;
 }
@@ -100,20 +97,6 @@ main:focus {
 ::selection {
   background: var(--c-accent);
   color: var(--c-ink);
-}
-
-.skip-link {
-  position: absolute;
-  left: var(--margin);
-  top: var(--s-2);
-  z-index: 100;
-  padding: var(--s-3) var(--s-4);
-  background: var(--c-ink);
-  color: #fff;
-  transform: translateY(-200%);
-}
-.skip-link:focus {
-  transform: none;
 }
 
 .visually-hidden {
@@ -138,13 +121,6 @@ main:focus {
 
 .section {
   padding-block: var(--section);
-}
-.section--field {
-  background: var(--c-surface-2);
-}
-.section--ink {
-  background: var(--c-ink);
-  color: #fff;
 }
 
 /* Vertical rhythm inside a block. */

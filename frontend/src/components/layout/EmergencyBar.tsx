@@ -37,7 +37,7 @@ export function EmergencyBar() {
     >
       <span className="grid leading-tight font-bold">
         {m.emergency.label}
-        <small className="text-[0.8125rem] font-semibold text-white/85">
+        <small className="text-[0.8125rem] font-semibold text-white">
           {m.emergency.open}
         </small>
       </span>

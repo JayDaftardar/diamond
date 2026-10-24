@@ -23,8 +23,8 @@ export function UtilityStrip() {
               href={phone.href}
               className={
                 index === 0
-                  ? 'tabular-nums underline-offset-4 hover:underline'
-                  : 'hidden tabular-nums underline-offset-4 before:mr-2 before:text-white/60 before:content-["/"] hover:underline sm:inline'
+                  ? 'py-1 tabular-nums underline-offset-4 hover:underline'
+                  : 'hidden py-1 tabular-nums underline-offset-4 before:mr-2 before:text-white/60 before:content-["/"] hover:underline sm:inline'
               }
             >
               {phone.display}

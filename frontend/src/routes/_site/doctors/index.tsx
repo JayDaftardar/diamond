@@ -49,7 +49,7 @@ function Doctors() {
             />
             {fmt(m.home.doctorsNote, { number: EMERGENCY_PHONE.display })}
           </p>
-          <DoctorGrid doctors={doctors} />
+          <DoctorGrid doctors={doctors} headingLevel="h2" />
         </Container>
       </section>
     </>
