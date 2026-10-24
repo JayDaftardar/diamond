@@ -1,7 +1,6 @@
 """Test setup: a throwaway Postgres database (diamond_test), emptied before every test."""
 
 import os
-
 from pathlib import Path
 
 

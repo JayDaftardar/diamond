@@ -2,6 +2,7 @@
 
 Safe to re-run: existing rows (matched by slug) are left untouched, so admin edits are
 never overwritten. Usage:  uv run python -m scripts.seed_content
+Doctor photos are loaded separately:  uv run python -m scripts.import_doctor_photos
 """
 
 from sqlalchemy import select
@@ -47,7 +48,7 @@ def seed_content(db: Session) -> dict[str, int]:
     for order, data in enumerate(DOCTORS, start=1):
         if db.scalar(select(Doctor.id).where(Doctor.slug == data["slug"])):
             continue
-        fields = {k: v for k, v in data.items() if k != "departments"}
+        fields = {k: v for k, v in data.items() if k not in ("departments", "photo")}
         doctor = Doctor(**fields, sort_order=order * 10)
         for dept_slug, is_primary in data["departments"]:
             doctor.department_links.append(

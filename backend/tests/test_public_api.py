@@ -34,11 +34,11 @@ def test_drafts_never_appear_anywhere(seeded):
 
 
 def test_published_treatment_is_visible_and_searchable(seeded):
-    publish(seeded, "coronary-angiography", youtube_video_id="dQw4w9WgXcQ")
+    publish(seeded, "coronary-angiography", youtube_video_ids=["dQw4w9WgXcQ"])
     detail = client.get(f"{API}/treatments/coronary-angiography").json()
     assert detail["title"] == "Coronary Angiography"
     assert detail["department"] == {"slug": "cardiology", "name": "Cardiology & CVTS"}
-    assert detail["youtube_video_id"] == "dQw4w9WgXcQ"
+    assert detail["youtube_video_ids"] == ["dQw4w9WgXcQ"]
 
     assert [t["slug"] for t in client.get(f"{API}/treatments", params={"q": "angio"}).json()] == [
         "coronary-angiography"
@@ -75,15 +75,22 @@ def test_hidden_treatment_and_department_disappear(seeded):
     assert "cardiology" not in [d["slug"] for d in client.get(f"{API}/departments").json()]
 
 
-def test_presentation_link_is_revalidated_at_render(seeded):
+def test_media_links_are_rechecked_at_render(seeded):
     good = "https://docs.google.com/presentation/d/1AbCdEfGhIjKlMnOp/edit?usp=sharing"
-    publish(seeded, "coronary-angiography", presentation_url=good)
-    url = client.get(f"{API}/treatments/coronary-angiography").json()["presentation_embed_url"]
-    assert url == "https://docs.google.com/presentation/d/1AbCdEfGhIjKlMnOp/embed"
+    publish(seeded, "coronary-angiography", presentation_urls=[good])
+    urls = client.get(f"{API}/treatments/coronary-angiography").json()["presentation_embed_urls"]
+    assert urls == ["https://docs.google.com/presentation/d/1AbCdEfGhIjKlMnOp/embed"]
 
-    publish(seeded, "coronary-angiography", presentation_url="https://evil.example/x")
+    # A bad stored value is skipped; the good ones around it are still shown.
+    publish(
+        seeded,
+        "coronary-angiography",
+        presentation_urls=["https://evil.example/x", good],
+        youtube_video_ids=["<script>", "dQw4w9WgXcQ", 42],
+    )
     detail = client.get(f"{API}/treatments/coronary-angiography").json()
-    assert detail["presentation_embed_url"] is None
+    assert detail["presentation_embed_urls"] == urls
+    assert detail["youtube_video_ids"] == ["dQw4w9WgXcQ"]
 
 
 def test_doctor_list_detail_and_related_treatments(seeded):

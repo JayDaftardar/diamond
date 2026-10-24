@@ -1,16 +1,15 @@
 import { Link, createFileRoute, redirect } from '@tanstack/react-router'
 import { Breadcrumbs } from '#/components/Breadcrumbs'
-import { DoctorPhoto } from '#/components/Doctor'
+import { DoctorPhoto, doctorPhotoSrc } from '#/components/Doctor'
 import { OpdStatusLine } from '#/components/OpdStatus'
 import { PhoneIcon } from '#/components/Icon'
 import { TreatmentList } from '#/components/departments/TreatmentList'
-import { DOCTOR_PHOTOS } from '#/content/doctor-photos'
 import { EMERGENCY_PHONE } from '#/content/config'
 import { fetchDoctor } from '#/lib/api'
 import { breadcrumbJsonLd, physicianJsonLd } from '#/lib/jsonld'
 import { fmt, m } from '#/lib/i18n'
 import { newSlugOrNotFound } from '#/lib/loaders'
-import { absoluteUrl, buildHead } from '#/lib/seo'
+import { buildHead } from '#/lib/seo'
 
 export const Route = createFileRoute('/_site/doctors/$slug')({
   loader: async ({ params }) => {
@@ -28,10 +27,7 @@ export const Route = createFileRoute('/_site/doctors/$slug')({
   },
   head: ({ loaderData: doctor }) => {
     if (!doctor) return {}
-    const photo =
-      doctor.photo_filename && DOCTOR_PHOTOS.includes(doctor.photo_filename)
-        ? absoluteUrl(`/images/doctors/${doctor.photo_filename}`)
-        : null
+    const photo = doctorPhotoSrc(doctor.photo_url)
     return buildHead({
       title: fmt(m.doctors.profileTitle, {
         name: doctor.name,
@@ -47,9 +43,7 @@ export const Route = createFileRoute('/_site/doctors/$slug')({
       }),
       path: `/doctors/${doctor.slug}`,
       type: 'profile',
-      image: doctor.photo_filename
-        ? `doctors/${doctor.photo_filename}`
-        : undefined,
+      image: photo ?? undefined,
       jsonLd: [
         physicianJsonLd(doctor, photo),
         breadcrumbJsonLd([

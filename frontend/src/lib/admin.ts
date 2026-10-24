@@ -59,7 +59,7 @@ export interface Doctor {
   achievements: string | null
   expertise: Array<string>
   opd_timings: string | null
-  photo_filename: string | null
+  photo_url: string | null
   department_ids: Array<number>
   primary_department_id: number | null
   sort_order: number
@@ -88,10 +88,8 @@ export interface TreatmentPage {
 
 export interface Treatment extends TreatmentListItem {
   description_html: string | null
-  youtube_video_id: string | null
-  youtube_url: string | null
-  presentation_url: string | null
-  presentation_provider: string | null
+  youtube_urls: Array<string>
+  presentation_urls: Array<string>
   doctor_ids: Array<number>
 }
 
@@ -147,8 +145,10 @@ export async function adminJson<T>(
       status: response.status,
       data: null,
       errors: body?.errors ?? {},
-      message:
-        typeof body?.detail === 'string' && !body.errors
+      // With field errors, the first one; forms show each by its field instead.
+      message: body?.errors
+        ? (Object.values(body.errors).at(0) ?? m.admin.errorGeneric)
+        : typeof body?.detail === 'string'
           ? body.detail
           : m.admin.errorGeneric,
     }

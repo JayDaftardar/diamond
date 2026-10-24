@@ -1,14 +1,17 @@
-"""Doctors management: create, edit, hide, delete. Photos are fixed files in the frontend's
-static folder; a doctor only references a file name (no upload anywhere)."""
+"""Doctors management: create, edit, hide, delete, and upload or remove a doctor's photo.
 
-from fastapi import APIRouter, Depends, HTTPException
+Photos are stored in the database (table doctor_photos) after being checked and re-encoded
+by app.services.photos; the original upload is never kept."""
+
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session, selectinload
 
 from app.db import get_db
 from app.errors import FieldError
-from app.models import Department, Doctor, DoctorDepartment
+from app.models import Department, Doctor, DoctorDepartment, DoctorPhoto
 from app.schemas.admin import DoctorIn, DoctorOut, VisibilityIn
+from app.services import photos
 from app.services.slugs import assign_slug, change_slug
 
 router = APIRouter(prefix="/doctors")
@@ -31,13 +34,13 @@ def _out(doctor: Doctor) -> DoctorOut:
                     "training",
                     "achievements",
                     "opd_timings",
-                    "photo_filename",
                     "sort_order",
                     "is_hidden",
                     "updated_at",
                 )
             },
             "expertise": doctor.expertise or [],
+            "photo_url": photos.photo_path(doctor.slug, doctor.photo_version),
             "department_ids": [link.department_id for link in links],
             "primary_department_id": primary,
         }
@@ -73,7 +76,6 @@ def _apply(db: Session, doctor: Doctor, body: DoctorIn) -> None:
     doctor.achievements = body.achievements
     doctor.expertise = body.expertise
     doctor.opd_timings = body.opd_timings
-    doctor.photo_filename = body.photo_filename
     doctor.is_hidden = body.is_hidden
     if body.sort_order is not None:
         doctor.sort_order = body.sort_order
@@ -137,3 +139,54 @@ def set_visibility(doctor_id: int, body: VisibilityIn, db: Session = Depends(get
 def delete_doctor(doctor_id: int, db: Session = Depends(get_db)):
     db.delete(_get(db, doctor_id))
     db.commit()
+
+
+# ------------------------------------------------------------------ photo
+
+
+async def _read_upload(request: Request) -> bytes:
+    """The request body, refusing anything over the size limit without reading it all."""
+    declared = request.headers.get("content-length")
+    if declared and declared.isdigit() and int(declared) > photos.MAX_UPLOAD_BYTES:
+        raise FieldError("photo", photos.TOO_LARGE)
+    chunks, size = [], 0
+    async for chunk in request.stream():
+        size += len(chunk)
+        if size > photos.MAX_UPLOAD_BYTES:
+            raise FieldError("photo", photos.TOO_LARGE)
+        chunks.append(chunk)
+    return b"".join(chunks)
+
+
+@router.put("/{doctor_id}/photo", response_model=DoctorOut)
+async def upload_photo(doctor_id: int, request: Request, db: Session = Depends(get_db)):
+    """Upload or replace the photo. The body is the image file itself (not a form)."""
+    doctor = _get(db, doctor_id)
+    content_type = request.headers.get("content-type", "").split(";")[0].strip().lower()
+    if not content_type.startswith("image/"):
+        raise FieldError("photo", photos.NOT_A_PHOTO)
+    try:
+        processed = photos.process_photo(await _read_upload(request))
+    except ValueError as exc:
+        raise FieldError("photo", str(exc)) from None
+
+    row = db.get(DoctorPhoto, doctor.id) or DoctorPhoto(doctor_id=doctor.id)
+    row.content_type = photos.CONTENT_TYPE
+    row.data = processed.data
+    row.width = processed.width
+    row.height = processed.height
+    db.add(row)
+    doctor.photo_version = processed.version
+    db.commit()
+    return _out(_get(db, doctor.id))
+
+
+@router.delete("/{doctor_id}/photo", response_model=DoctorOut)
+def delete_photo(doctor_id: int, db: Session = Depends(get_db)):
+    doctor = _get(db, doctor_id)
+    row = db.get(DoctorPhoto, doctor.id)
+    if row is not None:
+        db.delete(row)
+    doctor.photo_version = None
+    db.commit()
+    return _out(_get(db, doctor.id))

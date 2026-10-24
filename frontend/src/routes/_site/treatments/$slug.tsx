@@ -54,9 +54,18 @@ export const Route = createFileRoute('/_site/treatments/$slug')({
   component: TreatmentPage,
 })
 
+/** "Angioplasty, part 2" when there are several, so each player has its own name. */
+function partTitle(title: string, index: number, count: number) {
+  return count > 1
+    ? fmt(m.treatments.partTitle, { title, n: String(index + 1) })
+    : title
+}
+
 function TreatmentPage() {
   const treatment = Route.useLoaderData()
   const { department } = treatment
+  const videos = treatment.youtube_video_ids
+  const presentations = treatment.presentation_embed_urls
 
   return (
     <>
@@ -94,29 +103,55 @@ function TreatmentPage() {
         />
       </section>
 
-      {treatment.youtube_video_id ? (
+      {videos.length > 0 ? (
         <section className="section wrap split media-block">
-          <h2 data-rise="">{m.treatments.video}</h2>
-          <div data-rise="" style={{ '--i': 1 } as React.CSSProperties}>
-            <YouTubeEmbed
-              videoId={treatment.youtube_video_id}
-              title={treatment.title}
-            />
+          <h2 data-rise="">
+            {videos.length > 1 ? m.treatments.videos : m.treatments.video}
+          </h2>
+          <div className="media-list">
+            {videos.map((videoId, index) => (
+              <div
+                key={videoId}
+                data-rise=""
+                style={{ '--i': index + 1 } as React.CSSProperties}
+              >
+                <YouTubeEmbed
+                  videoId={videoId}
+                  title={partTitle(treatment.title, index, videos.length)}
+                />
+              </div>
+            ))}
           </div>
         </section>
       ) : null}
 
-      {treatment.presentation_embed_url ? (
+      {presentations.length > 0 ? (
         <section className="section section--field">
           <div className="wrap split media-block">
-            <h2 data-rise="">{m.treatments.presentation}</h2>
-            <div data-rise="" style={{ '--i': 1 } as React.CSSProperties}>
-              <PresentationFrame
-                url={treatment.presentation_embed_url}
-                title={fmt(m.treatments.presentationTitle, {
-                  title: treatment.title,
-                })}
-              />
+            <h2 data-rise="">
+              {presentations.length > 1
+                ? m.treatments.presentations
+                : m.treatments.presentation}
+            </h2>
+            <div className="media-list">
+              {presentations.map((url, index) => (
+                <div
+                  key={url}
+                  data-rise=""
+                  style={{ '--i': index + 1 } as React.CSSProperties}
+                >
+                  <PresentationFrame
+                    url={url}
+                    title={fmt(m.treatments.presentationTitle, {
+                      title: partTitle(
+                        treatment.title,
+                        index,
+                        presentations.length,
+                      ),
+                    })}
+                  />
+                </div>
+              ))}
             </div>
           </div>
         </section>

@@ -120,11 +120,11 @@ TREATMENTS: dict[str, list[str]] = {
     ],
 }
 
-# photo_filename names a file in frontend/public/images/doctors (None = silhouette placeholder).
+# "photo" names a file in seed/photos, loaded into the database by scripts/import_doctor_photos.py.
 DOCTORS: list[dict] = [
     {
         "slug": "dr-sayi-prasad",
-        "photo_filename": "dr-sayi-prasad.jpg",
+        "photo": "dr-sayi-prasad.jpg",
         "name": "Dr. Sayi Prasad",
         "designation": "Director & Senior Intensivist",
         "speciality": "Critical Care Medicine & Internal Medicine",
@@ -137,7 +137,7 @@ DOCTORS: list[dict] = [
     },
     {
         "slug": "dr-kaustubh-aurangabadkar",
-        "photo_filename": "dr-kaustubh-aurangabadkar.webp",
+        "photo": "dr-kaustubh-aurangabadkar.webp",
         "name": "Dr. Kaustubh Aurangabadkar",
         "designation": "Consultant Neurologist",
         "speciality": "Neurology",
@@ -150,7 +150,7 @@ DOCTORS: list[dict] = [
     },
     {
         "slug": "dr-vilas-naik",
-        "photo_filename": "dr-vilas-naik.png",
+        "photo": "dr-vilas-naik.png",
         "name": "Dr. Vilas Naik",
         "designation": "Cardiothoracic Surgeon & Nephrologist",
         "speciality": "Cardiothoracic Surgery & Nephrology",
@@ -164,7 +164,7 @@ DOCTORS: list[dict] = [
     },
     {
         "slug": "dr-gowri-sayi-prasad",
-        "photo_filename": "dr-gowri-sayi-prasad.jpg",
+        "photo": "dr-gowri-sayi-prasad.jpg",
         "name": "Dr. Gowri Sayi Prasad",
         "designation": "Chief Obstetrician & Gynaecologist",
         "speciality": "Obstetrics & Gynaecology",

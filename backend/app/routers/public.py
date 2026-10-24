@@ -12,6 +12,7 @@ from app.models import (
     Department,
     Doctor,
     DoctorDepartment,
+    DoctorPhoto,
     SlugRedirect,
     Treatment,
     TreatmentDoctor,
@@ -31,7 +32,7 @@ from app.schemas.public import (
     TreatmentItem,
 )
 from app.security.client import client_ip, hash_ip
-from app.services import contact_token, ratelimit
+from app.services import contact_token, ratelimit, youtube
 from app.services.embeds import safe_presentation_url
 from app.services.visibility import public_departments, public_doctors, public_treatments
 
@@ -170,7 +171,8 @@ def get_doctor(slug: str, db: Session = Depends(get_db)):
         if not link.department.is_hidden
     ]
     return DoctorDetail(
-        **DoctorCard.model_validate(doctor).model_dump(),
+        **DoctorCard.model_validate(doctor).model_dump(exclude={"photo_url"}),
+        photo_version=doctor.photo_version,
         qualifications=doctor.qualifications,
         training=_lines(doctor.training),
         achievements=_lines(doctor.achievements),
@@ -178,6 +180,36 @@ def get_doctor(slug: str, db: Session = Depends(get_db)):
         departments=departments,
         treatments=[_treatment_item(t) for t in related],
     )
+
+
+# Photos change rarely and their address carries a version hash, so a browser (or CDN)
+# that asked for the current version can keep it for a year without asking again.
+PHOTO_CACHE_FOREVER = "public, max-age=31536000, immutable"
+PHOTO_CACHE_SHORT = "public, max-age=300"
+
+
+@router.get("/doctors/{slug}/photo")
+def doctor_photo(
+    slug: str,
+    request: Request,
+    v: str | None = Query(None, max_length=32),
+    db: Session = Depends(get_db),
+):
+    """A public doctor's photo as WebP. Hidden doctors and doctors without a photo give 404."""
+    doctor = db.scalar(select(Doctor).where(Doctor.slug == slug, public_doctors()))
+    if doctor is None or doctor.photo_version is None:
+        raise HTTPException(404, "Photo not found")
+    etag = f'"{doctor.photo_version}"'
+    headers = {
+        "ETag": etag,
+        "Cache-Control": PHOTO_CACHE_FOREVER if v == doctor.photo_version else PHOTO_CACHE_SHORT,
+    }
+    if request.headers.get("if-none-match") == etag:
+        return Response(status_code=304, headers=headers)
+    photo = db.get(DoctorPhoto, doctor.id)
+    if photo is None:
+        raise HTTPException(404, "Photo not found")
+    return Response(content=photo.data, media_type=photo.content_type, headers=headers)
 
 
 # ---------------------------------------------------------------- treatments
@@ -219,9 +251,13 @@ def get_treatment(slug: str, db: Session = Depends(get_db)):
         title=treatment.title,
         department=DepartmentRef(slug=treatment.department.slug, name=treatment.department.name),
         description_html=treatment.description_html or "",
-        youtube_video_id=treatment.youtube_video_id,
-        # Re-validated on every render; an invalid stored link simply isn't shown.
-        presentation_embed_url=safe_presentation_url(treatment.presentation_url),
+        # Re-checked on every render; an invalid stored value simply isn't shown.
+        youtube_video_ids=[v for v in treatment.youtube_video_ids if youtube.is_video_id(v)],
+        presentation_embed_urls=[
+            url
+            for url in (safe_presentation_url(stored) for stored in treatment.presentation_urls)
+            if url
+        ],
         updated_at=treatment.updated_at,
         doctors=[DoctorCard.model_validate(d) for d in doctors],
     )

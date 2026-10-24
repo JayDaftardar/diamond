@@ -1,26 +1,30 @@
 import { Link } from '@tanstack/react-router'
 import { ChevronRightIcon } from '#/components/Icon'
 import { OpdStatusLine } from '#/components/OpdStatus'
-import { DOCTOR_PHOTOS } from '#/content/doctor-photos'
+import { API_PUBLIC_URL } from '#/content/config'
 import { fmt, m } from '#/lib/i18n'
 import type { DoctorCardData } from '#/lib/types'
 
-/** Portrait of a doctor, or a neutral silhouette until their photo file is added. */
+/** Full address of a doctor's photo (photos are served by the API from the database). */
+export function doctorPhotoSrc(photoUrl: string | null): string | null {
+  return photoUrl ? `${API_PUBLIC_URL}${photoUrl}` : null
+}
+
+/** Portrait of a doctor, or a neutral silhouette until a photo is uploaded. */
 export function DoctorPhoto({
   doctor,
   eager,
 }: {
-  doctor: Pick<DoctorCardData, 'name' | 'designation' | 'photo_filename'>
+  doctor: Pick<DoctorCardData, 'name' | 'designation' | 'photo_url'>
   eager?: boolean
 }) {
-  const file = doctor.photo_filename
-  const hasPhoto = file !== null && DOCTOR_PHOTOS.includes(file)
+  const src = doctorPhotoSrc(doctor.photo_url)
 
   return (
     <div className="doctor-photo">
-      {hasPhoto ? (
+      {src ? (
         <img
-          src={`/images/doctors/${file}`}
+          src={src}
           alt={fmt(m.doctors.photoAlt, {
             name: doctor.name,
             designation: doctor.designation,

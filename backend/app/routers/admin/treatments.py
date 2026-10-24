@@ -19,7 +19,7 @@ from app.schemas.admin import (
     TreatmentPage,
     VisibilityIn,
 )
-from app.services import embeds, youtube
+from app.services import youtube
 from app.services.slugs import assign_slug, change_slug
 from app.services.visibility import has_text, treatment_status
 
@@ -37,10 +37,8 @@ def _out(t: Treatment) -> TreatmentOut:
         title=t.title,
         department=_dept(t),
         description_html=t.description_html,
-        youtube_video_id=t.youtube_video_id,
-        youtube_url=youtube.watch_url(t.youtube_video_id) if t.youtube_video_id else None,
-        presentation_url=t.presentation_url,
-        presentation_provider=t.presentation_provider,
+        youtube_urls=[youtube.watch_url(video_id) for video_id in t.youtube_video_ids],
+        presentation_urls=list(t.presentation_urls),
         doctor_ids=[link.doctor_id for link in t.doctor_links],
         is_hidden=t.is_hidden,
         status=treatment_status(t),
@@ -72,14 +70,9 @@ def _apply(db: Session, t: Treatment, body: TreatmentIn) -> None:
     t.department_id = body.department_id
     t.description_html = body.description_html  # already sanitised by the schema
     t.is_hidden = body.is_hidden
-    # Only the 11-character id is stored for YouTube, never the URL.
-    t.youtube_video_id = youtube.extract_video_id(body.youtube_url) if body.youtube_url else None
-    if body.presentation_url:
-        t.presentation_url, t.presentation_provider = embeds.validate_presentation_url(
-            body.presentation_url
-        )
-    else:
-        t.presentation_url = t.presentation_provider = None
+    # Already checked by the schema: bare YouTube ids and normalised presentation embed links.
+    t.youtube_video_ids = body.youtube_urls
+    t.presentation_urls = body.presentation_urls
 
     t.doctor_links.clear()
     db.flush()

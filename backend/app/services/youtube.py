@@ -50,3 +50,8 @@ def extract_video_id(raw: str) -> str:
 def watch_url(video_id: str) -> str:
     """Canonical link shown back to the admin when editing."""
     return f"https://www.youtube.com/watch?v={video_id}"
+
+
+def is_video_id(value: object) -> bool:
+    """True for a bare 11-character video id; used to re-check stored ids before showing them."""
+    return isinstance(value, str) and bool(_ID.match(value))

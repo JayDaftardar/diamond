@@ -42,8 +42,8 @@ def test_create_treatment_sanitises_and_stores_only_the_video_id(admin_client, d
                 '<a href="javascript:alert(1)">bad</a><a href="https://example.org/a">ok</a>'
                 '<img src="x" onerror="alert(1)"><iframe src="https://evil.example"></iframe>'
             ),
-            youtube_url="https://youtu.be/dQw4w9WgXcQ?t=42",
-            presentation_url="https://docs.google.com/presentation/d/1AbCdEfGhIjKlMnOp/edit",
+            youtube_urls=["https://youtu.be/dQw4w9WgXcQ?t=42"],
+            presentation_urls=["https://docs.google.com/presentation/d/1AbCdEfGhIjKlMnOp/edit"],
         ),
     )
     assert r.status_code == 201, r.text
@@ -55,20 +55,17 @@ def test_create_treatment_sanitises_and_stores_only_the_video_id(admin_client, d
     assert 'rel="noopener noreferrer nofollow"' in html
 
     assert body["slug"] == "angioplasty" and body["status"] == "public"
-    assert body["youtube_video_id"] == "dQw4w9WgXcQ"
-    assert body["youtube_url"] == "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-    assert (
-        body["presentation_url"] == "https://docs.google.com/presentation/d/1AbCdEfGhIjKlMnOp/embed"
-    )
-    assert body["presentation_provider"] == "google_slides"
+    assert body["youtube_urls"] == ["https://www.youtube.com/watch?v=dQw4w9WgXcQ"]
+    assert body["presentation_urls"] == [
+        "https://docs.google.com/presentation/d/1AbCdEfGhIjKlMnOp/embed"
+    ]
 
     # Stored value is the bare id, and the public page can show it.
-    assert (
-        db.scalar(select(Treatment.youtube_video_id).where(Treatment.slug == "angioplasty"))
-        == "dQw4w9WgXcQ"
-    )
+    assert db.scalar(
+        select(Treatment.youtube_video_ids).where(Treatment.slug == "angioplasty")
+    ) == ["dQw4w9WgXcQ"]
     public = PUBLIC.get("/api/v1/public/treatments/angioplasty").json()
-    assert public["youtube_video_id"] == "dQw4w9WgXcQ"
+    assert public["youtube_video_ids"] == ["dQw4w9WgXcQ"]
 
 
 def test_treatment_without_description_is_a_draft_and_not_public(admin_client, db):
@@ -84,18 +81,64 @@ def test_treatment_without_description_is_a_draft_and_not_public(admin_client, d
 def test_bad_links_are_rejected_with_field_errors(admin_client, db):
     seed_content(db)
     cases = {
-        "youtube_url": "https://vimeo.com/123456",
-        "presentation_url": "https://evil.example/slides",
+        "youtube_urls": ["https://youtu.be/dQw4w9WgXcQ", "https://vimeo.com/123456"],
+        "presentation_urls": ["", "https://evil.example/slides"],
         "slug": "Not A Slug!",
     }
     for field, value in cases.items():
         r = admin_client.post(f"{A}/treatments", json=treatment_payload(db, **{field: value}))
         assert r.status_code == 422 and field in r.json()["errors"], (field, r.text)
+        if isinstance(value, list):  # the bad slot is named, so the form can mark it
+            assert f"{field}.1" in r.json()["errors"] and f"{field}.0" not in r.json()["errors"]
+    too_many = [f"https://youtu.be/{'a' * 10}{n}" for n in range(11)]
+    r = admin_client.post(f"{A}/treatments", json=treatment_payload(db, youtube_urls=too_many))
+    assert r.status_code == 422 and "youtube_urls" in r.json()["errors"]
     # Nothing was created: only the seeded "Coronary Angiography" exists.
     assert (
         db.scalar(select(func.count(Treatment.id)).where(Treatment.title == "Coronary Angiography"))
         == 1
     )
+
+
+def test_several_videos_and_presentations_keep_their_order(admin_client, db):
+    seed_content(db)
+    slides = "https://docs.google.com/presentation/d/1AbCdEfGhIjKlMnOp/edit"
+    other = "https://docs.google.com/presentation/d/9ZyXwVuTsRqPoNm/embed"
+    r = admin_client.post(
+        f"{A}/treatments",
+        json=treatment_payload(
+            db,
+            title="Angioplasty",
+            # Blank slots and repeats are dropped; the rest keep the admin's order.
+            youtube_urls=[
+                "https://youtu.be/bbbbbbbbbbb",
+                "",
+                "https://youtu.be/aaaaaaaaaaa",
+                "https://www.youtube.com/watch?v=bbbbbbbbbbb",
+            ],
+            presentation_urls=[other, slides, "  "],
+        ),
+    )
+    assert r.status_code == 201, r.text
+    body = r.json()
+    assert body["youtube_urls"] == [
+        "https://www.youtube.com/watch?v=bbbbbbbbbbb",
+        "https://www.youtube.com/watch?v=aaaaaaaaaaa",
+    ]
+    assert body["presentation_urls"] == [
+        other,
+        "https://docs.google.com/presentation/d/1AbCdEfGhIjKlMnOp/embed",
+    ]
+    public = PUBLIC.get("/api/v1/public/treatments/angioplasty").json()
+    assert public["youtube_video_ids"] == ["bbbbbbbbbbb", "aaaaaaaaaaa"]
+    assert len(public["presentation_embed_urls"]) == 2
+
+    # Saving with no slots removes them all.
+    r = admin_client.put(
+        f"{A}/treatments/{body['id']}",
+        json=treatment_payload(db, title="Angioplasty", youtube_urls=[], presentation_urls=[]),
+    )
+    assert r.json()["youtube_urls"] == [] and r.json()["presentation_urls"] == []
 
 
 def test_unknown_department_or_doctor_is_rejected(admin_client, db):
@@ -117,7 +160,7 @@ def test_edit_hide_filter_and_delete_treatment(admin_client, db):
 
     r = admin_client.put(
         f"{A}/treatments/{tid}",
-        json=treatment_payload(db, doctor_ids=[naik], youtube_url="", presentation_url=""),
+        json=treatment_payload(db, doctor_ids=[naik], youtube_urls=[""], presentation_urls=[]),
     )
     assert (
         r.status_code == 200 and r.json()["status"] == "public" and r.json()["doctor_ids"] == [naik]
@@ -187,7 +230,7 @@ def test_doctor_lifecycle_with_two_departments(admin_client, db):
     urology, nephrology = dept_id(db, "urology"), dept_id(db, "nephrology")
     r = admin_client.post(
         f"{A}/doctors",
-        json=doctor_payload(db, primary_department_id=nephrology, photo_filename="dr-test.jpg"),
+        json=doctor_payload(db, primary_department_id=nephrology),
     )
     # A blank expertise entry is invalid; fix and retry.
     assert r.status_code == 422 and "expertise" in r.json()["errors"]
@@ -197,7 +240,6 @@ def test_doctor_lifecycle_with_two_departments(admin_client, db):
             db,
             expertise=["Kidney Stones"],
             primary_department_id=nephrology,
-            photo_filename="dr-test.jpg",
         ),
     )
     assert r.status_code == 201, r.text
@@ -218,13 +260,8 @@ def test_doctor_lifecycle_with_two_departments(admin_client, db):
     assert admin_client.delete(f"{A}/doctors/{doc['id']}").status_code == 204
 
 
-def test_doctor_photo_must_be_a_plain_file_name_and_primary_must_be_selected(admin_client, db):
+def test_doctor_primary_department_must_be_one_of_the_selected(admin_client, db):
     seed_content(db)
-    for bad in ("../secret.jpg", "photo.exe", "Has Space.jpg", "https://x.example/a.jpg"):
-        r = admin_client.post(
-            f"{A}/doctors", json=doctor_payload(db, expertise=[], photo_filename=bad)
-        )
-        assert r.status_code == 422 and "photo_filename" in r.json()["errors"], bad
     r = admin_client.post(
         f"{A}/doctors",
         json=doctor_payload(db, expertise=[], primary_department_id=dept_id(db, "ent")),

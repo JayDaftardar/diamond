@@ -1,6 +1,18 @@
 """Public content: departments, doctors, treatments and their links."""
 
-from sqlalchemy import Boolean, CheckConstraint, ForeignKey, Integer, String, Text, UniqueConstraint
+from datetime import datetime
+
+from sqlalchemy import (
+    Boolean,
+    DateTime,
+    ForeignKey,
+    Integer,
+    LargeBinary,
+    String,
+    Text,
+    UniqueConstraint,
+    func,
+)
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -27,13 +39,6 @@ class Department(TimestampMixin, Base):
 
 class Doctor(TimestampMixin, Base):
     __tablename__ = "doctors"
-    # Photo files live in the frontend's static assets; only a safe file name is stored.
-    __table_args__ = (
-        CheckConstraint(
-            "photo_filename IS NULL OR photo_filename ~ '^[a-z0-9-]+\\.(webp|jpg|jpeg|png)$'",
-            name="ck_doctors_photo_filename",
-        ),
-    )
 
     id: Mapped[int] = mapped_column(primary_key=True)
     slug: Mapped[str] = mapped_column(String(120), unique=True, index=True)
@@ -45,7 +50,9 @@ class Doctor(TimestampMixin, Base):
     achievements: Mapped[str | None] = mapped_column(Text)
     expertise: Mapped[list[str]] = mapped_column(JSONB, default=list)
     opd_timings: Mapped[str | None] = mapped_column(String(300))
-    photo_filename: Mapped[str | None] = mapped_column(String(120))
+    # Short hash of the stored photo (None = no photo). It goes into the photo's address, so
+    # browsers can cache a photo forever and still fetch a new one the moment it changes.
+    photo_version: Mapped[str | None] = mapped_column(String(16))
     sort_order: Mapped[int] = mapped_column(Integer, default=0, index=True)
     is_hidden: Mapped[bool] = mapped_column(Boolean, default=False)
 
@@ -54,6 +61,27 @@ class Doctor(TimestampMixin, Base):
     )
     treatment_links: Mapped[list["TreatmentDoctor"]] = relationship(
         back_populates="doctor", cascade="all, delete-orphan"
+    )
+
+
+class DoctorPhoto(Base):
+    """A doctor's portrait, stored in the database as a small re-encoded WebP.
+
+    Kept in its own table so the image bytes are only read when the photo itself is
+    requested, never when doctors are listed.
+    """
+
+    __tablename__ = "doctor_photos"
+
+    doctor_id: Mapped[int] = mapped_column(
+        ForeignKey("doctors.id", ondelete="CASCADE"), primary_key=True
+    )
+    content_type: Mapped[str] = mapped_column(String(40))
+    data: Mapped[bytes] = mapped_column(LargeBinary)
+    width: Mapped[int] = mapped_column(Integer)
+    height: Mapped[int] = mapped_column(Integer)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
     )
 
 
@@ -76,12 +104,6 @@ class DoctorDepartment(Base):
 
 class Treatment(TimestampMixin, Base):
     __tablename__ = "treatments"
-    __table_args__ = (
-        CheckConstraint(
-            "youtube_video_id IS NULL OR youtube_video_id ~ '^[A-Za-z0-9_-]{11}$'",
-            name="ck_treatments_youtube_id",
-        ),
-    )
 
     id: Mapped[int] = mapped_column(primary_key=True)
     slug: Mapped[str] = mapped_column(String(160), unique=True, index=True)
@@ -89,9 +111,10 @@ class Treatment(TimestampMixin, Base):
     department_id: Mapped[int] = mapped_column(ForeignKey("departments.id"), index=True)
     # Sanitised on save. Empty/NULL means the treatment is a draft (see services/visibility).
     description_html: Mapped[str | None] = mapped_column(Text)
-    youtube_video_id: Mapped[str | None] = mapped_column(String(11))
-    presentation_url: Mapped[str | None] = mapped_column(Text)
-    presentation_provider: Mapped[str | None] = mapped_column(String(40))
+    # In the order the admin entered them. Only bare 11-character YouTube ids are stored, and
+    # presentations as normalised embed links; both are checked again before they are shown.
+    youtube_video_ids: Mapped[list[str]] = mapped_column(JSONB, default=list, server_default="[]")
+    presentation_urls: Mapped[list[str]] = mapped_column(JSONB, default=list, server_default="[]")
     is_hidden: Mapped[bool] = mapped_column(Boolean, default=False)
 
     department: Mapped[Department] = relationship(back_populates="treatments")

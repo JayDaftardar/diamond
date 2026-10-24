@@ -245,7 +245,6 @@ diamondwebsite/
 │   │   ├── content/
 │   │   │   ├── en.ts          ALL visible UI strings (Marathi = add mr.ts later)
 │   │   │   ├── site.ts        hospital facts: address, phones, hours, insurers
-│   │   │   └── doctor-photos.ts  generated manifest of files in public/images/doctors
 │   │   ├── lib/               api client, seo helpers, json-ld builders, i18n t()
 │   │   └── styles/            tokens.css, base.css, utilities
 │   ├── public/images/         hospital/, doctors/, insurers/ (placeholders until supplied)
@@ -312,7 +311,10 @@ doctors
   id PK · slug UNIQUE · name · designation · speciality
   qualifications TEXT · training TEXT NULL · achievements TEXT NULL
   expertise JSONB (list of strings) · opd_timings TEXT NULL
-  photo_filename TEXT NULL (validated: ^[a-z0-9-]+\.(webp|jpg|png)$)
+  photo_version TEXT NULL (short hash of the stored photo; NULL = no photo)
+
+doctor_photos  (one row per doctor with a photo; bytes kept out of doctor queries)
+  doctor_id PK FK→doctors ON DELETE CASCADE · content_type · data BYTEA · width · height
   sort_order · is_hidden · timestamps
 
 doctor_departments  (doctor_id, department_id) composite PK · is_primary BOOL
@@ -322,8 +324,8 @@ doctor_departments  (doctor_id, department_id) composite PK · is_primary BOOL
 treatments
   id PK · slug UNIQUE · title · department_id FK → departments NOT NULL
   description_html TEXT NULL (sanitised on save)
-  youtube_video_id CHAR(11) NULL
-  presentation_url TEXT NULL · presentation_provider TEXT NULL
+  youtube_video_ids JSONB list (bare 11-char ids, admin's order, max 10)
+  presentation_urls JSONB list (normalised embed links, admin's order, max 10)
   is_hidden BOOL · timestamps
   -- "draft" is DERIVED: description_html empty (after stripping tags) → draft
 
@@ -433,8 +435,11 @@ timings, quick links, lazy map), `Button`, `PhoneLink`, `DoctorCard`, `Departmen
   hero `fetchpriority="high"`, everything else lazy.
 - Placeholders: clearly labelled grey frames ("Hospital photo, to be supplied"), same
   aspect ratio as the real photo so nothing shifts on swap.
-- Doctor photos: `public/images/doctors/{file}`; admin picks from the generated manifest;
-  missing file → neutral silhouette placeholder.
+- Doctor photos (changed after iteration 1): uploaded in the admin and stored in PostgreSQL.
+  Every upload is checked (real JPEG/PNG/WebP, max 8 MB) and re-encoded to a WebP of at most
+  800x1000, which also strips EXIF/GPS. Served at /api/v1/public/doctors/{slug}/photo?v={hash}
+  with a one-year immutable cache; a new photo gets a new hash. No photo → silhouette.
+  Starting photos live in backend/seed/photos and load with `scripts.import_doctor_photos`.
 - Maps and YouTube load on demand (lazy / click). Budget: LCP < 2.5s on mid-range Android
   over 4G, JS for public pages < 120KB gzip.
 

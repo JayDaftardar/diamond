@@ -5,19 +5,50 @@ import re
 from datetime import datetime
 from typing import Annotated
 
-from pydantic import BaseModel, ConfigDict, Field, StringConstraints, field_validator
+from pydantic import (
+    BaseModel,
+    BeforeValidator,
+    ConfigDict,
+    Field,
+    StringConstraints,
+    field_validator,
+)
 
 from app.services import embeds, youtube
 from app.services.sanitize import MAX_HTML_LENGTH, clean_html
 from app.services.slugs import SLUG_MESSAGE, SLUG_PATTERN
-
-PHOTO_PATTERN = r"^[a-z0-9-]+\.(webp|jpg|jpeg|png)$"
 
 Text = Annotated[str, StringConstraints(strip_whitespace=True)]
 
 
 def _blank_to_none(value: str | None) -> str | None:
     return value.strip() or None if isinstance(value, str) else None
+
+
+def _youtube_slot(value) -> str | None:
+    """One video slot: blank, or a YouTube link turned into its bare 11-character id."""
+    value = _blank_to_none(value)
+    if value is not None and len(value) > 300:
+        raise ValueError("That link is too long.")
+    return youtube.extract_video_id(value) if value is not None else None
+
+
+def _presentation_slot(value) -> str | None:
+    """One presentation slot: blank, or an allowlisted link normalised to its embed form."""
+    value = _blank_to_none(value)
+    if value is not None and len(value) > 1000:
+        raise ValueError("That link is too long.")
+    return embeds.validate_presentation_url(value)[0] if value is not None else None
+
+
+def _filled_and_unique(values: list[str | None]) -> list[str]:
+    """Drops empty slots and repeats, keeping the admin's order."""
+    return list(dict.fromkeys(v for v in values if v))
+
+
+MAX_MEDIA = 10  # videos, and separately presentations, per treatment
+YoutubeSlot = Annotated[str | None, BeforeValidator(_youtube_slot)]
+PresentationSlot = Annotated[str | None, BeforeValidator(_presentation_slot)]
 
 
 class _Out(BaseModel):
@@ -152,7 +183,6 @@ class DoctorIn(_SlugMixin):
         Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=100)]
     ] = Field(default_factory=list, max_length=30)
     opd_timings: str | None = Field(None, max_length=300)
-    photo_filename: str | None = Field(None, max_length=120)
     department_ids: list[int] = Field(min_length=1, max_length=14)
     primary_department_id: int | None = None
     sort_order: int | None = None
@@ -162,16 +192,6 @@ class DoctorIn(_SlugMixin):
     @classmethod
     def _optional_text(cls, v):
         return _blank_to_none(v)
-
-    @field_validator("photo_filename", mode="before")
-    @classmethod
-    def _photo(cls, v):
-        v = _blank_to_none(v)
-        if v is not None and not re.fullmatch(PHOTO_PATTERN, v):
-            raise ValueError(
-                "Use the photo's file name only, in lowercase, ending in .webp, .jpg or .png."
-            )
-        return v
 
 
 class DoctorOut(_Out):
@@ -185,7 +205,7 @@ class DoctorOut(_Out):
     achievements: str | None
     expertise: list[str]
     opd_timings: str | None
-    photo_filename: str | None
+    photo_url: str | None  # relative to the API; None until a photo is uploaded
     department_ids: list[int]
     primary_department_id: int | None
     sort_order: int
@@ -200,8 +220,10 @@ class TreatmentIn(_SlugMixin):
     title: Text = Field(min_length=2, max_length=200)
     department_id: int
     description_html: str | None = Field(None, max_length=MAX_HTML_LENGTH)
-    youtube_url: str | None = Field(None, max_length=300)
-    presentation_url: str | None = Field(None, max_length=1000)
+    # One entry per slot in the form; empty slots are allowed and dropped. An error in a slot
+    # is reported as e.g. "youtube_urls.1", so the form can show it next to that slot.
+    youtube_urls: list[YoutubeSlot] = Field(default_factory=list, max_length=MAX_MEDIA)
+    presentation_urls: list[PresentationSlot] = Field(default_factory=list, max_length=MAX_MEDIA)
     doctor_ids: list[int] = Field(default_factory=list, max_length=20)
     is_hidden: bool = False
 
@@ -210,19 +232,10 @@ class TreatmentIn(_SlugMixin):
     def _description(cls, v):
         return clean_html(v)  # None when only empty markup is left, which keeps it a draft
 
-    @field_validator("youtube_url", mode="before")
+    @field_validator("youtube_urls", "presentation_urls")
     @classmethod
-    def _youtube(cls, v):
-        v = _blank_to_none(v)
-        if v is not None:
-            youtube.extract_video_id(v)  # raises ValueError with an admin-friendly message
-        return v
-
-    @field_validator("presentation_url", mode="before")
-    @classmethod
-    def _presentation(cls, v):
-        v = _blank_to_none(v)
-        return embeds.validate_presentation_url(v)[0] if v is not None else None
+    def _media(cls, v):
+        return _filled_and_unique(v)
 
 
 class DepartmentRefOut(_Out):
@@ -237,10 +250,8 @@ class TreatmentOut(BaseModel):
     title: str
     department: DepartmentRefOut
     description_html: str | None
-    youtube_video_id: str | None
-    youtube_url: str | None
-    presentation_url: str | None
-    presentation_provider: str | None
+    youtube_urls: list[str]  # watch links, rebuilt from the stored ids
+    presentation_urls: list[str]  # normalised embed links
     doctor_ids: list[int]
     is_hidden: bool
     status: str  # public | draft | hidden

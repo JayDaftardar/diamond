@@ -43,6 +43,9 @@ def create_app() -> FastAPI:
             field = str(loc[0]) if loc else "form"
             message = err["msg"].removeprefix("Value error, ")
             errors.setdefault(field, message)
+            if len(loc) > 1 and isinstance(loc[1], int):
+                # An item in a list, e.g. "youtube_urls.1", so the form can mark that one entry.
+                errors.setdefault(f"{field}.{loc[1]}", message)
         return JSONResponse({"detail": "Validation failed", "errors": errors}, status_code=422)
 
     @app.exception_handler(FieldError)

@@ -6,7 +6,14 @@ import type { Department, Doctor, Treatment } from '#/lib/admin'
 import { m } from '#/lib/i18n'
 import { DeleteButton, FormAlert } from './AdminUi'
 import { Check, CheckGroup, SelectField, TextField } from './Fields'
+import { LinkList } from './LinkList'
 import { RichText } from './RichText'
+
+const MAX_MEDIA = 10 // same limit as the server
+
+/** At least one box, so there is always somewhere to paste a link. */
+const slots = (links: Array<string> | undefined) =>
+  links?.length ? links : ['']
 
 /** Create or edit a treatment. Pass `initial` to edit. */
 export function TreatmentForm({
@@ -23,6 +30,7 @@ export function TreatmentForm({
   const c = m.admin.common
 
   const [title, setTitle] = useState(initial?.title ?? '')
+  // The page address, made by the server from the title; used for the "View on website" link.
   const [slug, setSlug] = useState(initial?.slug ?? '')
   const [departmentId, setDepartmentId] = useState(
     String(initial?.department.id ?? departments.at(0)?.id ?? ''),
@@ -30,9 +38,9 @@ export function TreatmentForm({
   const [description, setDescription] = useState(
     initial?.description_html ?? '',
   )
-  const [youtube, setYoutube] = useState(initial?.youtube_url ?? '')
-  const [presentation, setPresentation] = useState(
-    initial?.presentation_url ?? '',
+  const [videos, setVideos] = useState(() => slots(initial?.youtube_urls))
+  const [presentations, setPresentations] = useState(() =>
+    slots(initial?.presentation_urls),
   )
   const [doctorIds, setDoctorIds] = useState<Array<number>>(
     initial?.doctor_ids ?? [],
@@ -56,11 +64,10 @@ export function TreatmentForm({
         method: initial ? 'PUT' : 'POST',
         json: {
           title,
-          slug,
           department_id: Number(departmentId),
           description_html: description,
-          youtube_url: youtube,
-          presentation_url: presentation,
+          youtube_urls: videos,
+          presentation_urls: presentations,
           doctor_ids: doctorIds,
           is_hidden: hidden,
         },
@@ -94,7 +101,10 @@ export function TreatmentForm({
   return (
     <form className="admin-form stack" onSubmit={save} noValidate>
       {message || Object.keys(errors).length > 0 ? (
-        <FormAlert title={c.formErrorTitle} text={message || c.formErrorFix} />
+        <FormAlert
+          title={c.formErrorTitle}
+          text={Object.keys(errors).length > 0 ? c.formErrorFix : message}
+        />
       ) : null}
       {saved ? (
         <p className="admin-saved" role="status">
@@ -128,15 +138,6 @@ export function TreatmentForm({
         }))}
         required
       />
-      <TextField
-        id="tr-slug"
-        label={c.slug}
-        hint={initial ? c.slugHintEdit : c.slugHintNew}
-        value={slug}
-        onChange={setSlug}
-        error={errors.slug}
-        maxLength={120}
-      />
       <RichText
         id="tr-description"
         label={t.description}
@@ -145,22 +146,30 @@ export function TreatmentForm({
         onChange={setDescription}
         error={errors.description_html}
       />
-      <TextField
+      <LinkList
         id="tr-youtube"
-        label={t.youtube}
+        name="youtube_urls"
+        legend={t.youtube}
         hint={t.youtubeHint}
-        value={youtube}
-        onChange={setYoutube}
-        error={errors.youtube_url}
+        slotLabel={t.youtubeSlot}
+        addLabel={t.addVideo}
+        values={videos}
+        onChange={setVideos}
+        errors={errors}
+        max={MAX_MEDIA}
         maxLength={300}
       />
-      <TextField
+      <LinkList
         id="tr-presentation"
-        label={t.presentation}
+        name="presentation_urls"
+        legend={t.presentation}
         hint={t.presentationHint}
-        value={presentation}
-        onChange={setPresentation}
-        error={errors.presentation_url}
+        slotLabel={t.presentationSlot}
+        addLabel={t.addPresentation}
+        values={presentations}
+        onChange={setPresentations}
+        errors={errors}
+        max={MAX_MEDIA}
         maxLength={1000}
       />
       <CheckGroup

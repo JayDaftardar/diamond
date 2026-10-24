@@ -11,7 +11,10 @@ export interface SeoInput {
   fullTitle?: boolean
   /** Open Graph type. */
   type?: 'website' | 'article' | 'profile'
-  /** Image path under /public (falls back to the site image if one is configured). */
+  /**
+   * Image path under /public/images, or a full https:// address (doctor photos come from the
+   * API). Falls back to the site image if one is configured.
+   */
   image?: string | null
   /** Keep search engines out (search results, admin). */
   noindex?: boolean
@@ -39,7 +42,11 @@ export function buildHead(seo: SeoInput) {
     : `${seo.title} | ${m.site.titleSuffix}`
   const url = absoluteUrl(seo.path)
   const image = seo.image ?? OG_IMAGE
-  const imageUrl = image ? absoluteUrl(`/images/${image}`) : null
+  const imageUrl = image
+    ? /^https?:\/\//.test(image)
+      ? image
+      : absoluteUrl(`/images/${image}`)
+    : null
 
   return {
     meta: [

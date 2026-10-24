@@ -15,7 +15,6 @@ export function DepartmentForm({ initial }: { initial?: Department }) {
   const c = m.admin.common
 
   const [name, setName] = useState(initial?.name ?? '')
-  const [slug, setSlug] = useState(initial?.slug ?? '')
   const [summary, setSummary] = useState(initial?.summary ?? '')
   const [intro, setIntro] = useState(initial?.intro_html ?? '')
   const [hidden, setHidden] = useState(initial?.is_hidden ?? false)
@@ -37,7 +36,6 @@ export function DepartmentForm({ initial }: { initial?: Department }) {
         method: initial ? 'PUT' : 'POST',
         json: {
           name,
-          slug,
           summary,
           intro_html: intro,
           is_hidden: hidden,
@@ -51,7 +49,6 @@ export function DepartmentForm({ initial }: { initial?: Department }) {
       return
     }
     if (initial) {
-      if (result.data) setSlug(result.data.slug)
       setSaved(true)
     } else {
       await navigate({ to: '/admin/departments' })
@@ -72,7 +69,10 @@ export function DepartmentForm({ initial }: { initial?: Department }) {
   return (
     <form className="admin-form stack" onSubmit={save} noValidate>
       {message || Object.keys(errors).length > 0 ? (
-        <FormAlert title={c.formErrorTitle} text={message || c.formErrorFix} />
+        <FormAlert
+          title={c.formErrorTitle}
+          text={Object.keys(errors).length > 0 ? c.formErrorFix : message}
+        />
       ) : null}
       {saved ? (
         <p className="admin-saved" role="status">
@@ -88,15 +88,6 @@ export function DepartmentForm({ initial }: { initial?: Department }) {
         error={errors.name}
         maxLength={160}
         required
-      />
-      <TextField
-        id="dept-slug"
-        label={c.slug}
-        hint={initial ? c.slugHintEdit : c.slugHintNew}
-        value={slug}
-        onChange={setSlug}
-        error={errors.slug}
-        maxLength={120}
       />
       <TextAreaField
         id="dept-summary"

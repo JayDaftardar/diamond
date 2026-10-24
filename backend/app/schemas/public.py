@@ -2,7 +2,9 @@
 
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field, computed_field
+
+from app.services.photos import photo_path
 
 
 class _Out(BaseModel):
@@ -24,7 +26,14 @@ class DoctorCard(_Out):
     designation: str
     speciality: str
     opd_timings: str | None
-    photo_filename: str | None
+    # Read from the doctor row but not sent; visitors get `photo_url` instead.
+    photo_version: str | None = Field(default=None, exclude=True)
+
+    @computed_field
+    @property
+    def photo_url(self) -> str | None:
+        """Address of the photo, relative to the API (None = show the silhouette)."""
+        return photo_path(self.slug, self.photo_version)
 
 
 class TreatmentItem(BaseModel):
@@ -61,8 +70,8 @@ class TreatmentDetail(BaseModel):
     title: str
     department: DepartmentRef
     description_html: str
-    youtube_video_id: str | None
-    presentation_embed_url: str | None
+    youtube_video_ids: list[str]
+    presentation_embed_urls: list[str]
     updated_at: datetime
     doctors: list[DoctorCard]
 

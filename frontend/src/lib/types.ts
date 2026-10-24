@@ -15,7 +15,8 @@ export interface DoctorCardData {
   designation: string
   speciality: string
   opd_timings: string | null
-  photo_filename: string | null
+  /** Photo address relative to the API, with a version for caching; null = silhouette. */
+  photo_url: string | null
 }
 
 export interface TreatmentItem {
@@ -53,8 +54,8 @@ export interface TreatmentDetail {
   title: string
   department: DepartmentRef
   description_html: string
-  youtube_video_id: string | null
-  presentation_embed_url: string | null
+  youtube_video_ids: string[]
+  presentation_embed_urls: string[]
   updated_at: string
   doctors: DoctorCardData[]
 }

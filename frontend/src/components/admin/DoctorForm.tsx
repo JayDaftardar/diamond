@@ -1,11 +1,11 @@
 import { useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import type { FormEvent } from 'react'
-import { DOCTOR_PHOTOS } from '#/content/doctor-photos'
 import { adminJson, linesToList, listToLines } from '#/lib/admin'
 import type { Department, Doctor } from '#/lib/admin'
 import { m } from '#/lib/i18n'
 import { DeleteButton, FormAlert } from './AdminUi'
+import { PhotoUpload } from './PhotoUpload'
 import {
   Check,
   CheckGroup,
@@ -19,7 +19,6 @@ export function doctorInput(doctor: Doctor, overrides: Partial<Doctor> = {}) {
   const d = { ...doctor, ...overrides }
   return {
     name: d.name,
-    slug: d.slug,
     designation: d.designation,
     speciality: d.speciality,
     qualifications: d.qualifications,
@@ -27,7 +26,6 @@ export function doctorInput(doctor: Doctor, overrides: Partial<Doctor> = {}) {
     achievements: d.achievements,
     expertise: d.expertise,
     opd_timings: d.opd_timings,
-    photo_filename: d.photo_filename,
     department_ids: d.department_ids,
     primary_department_id: d.primary_department_id,
     sort_order: d.sort_order,
@@ -48,7 +46,6 @@ export function DoctorForm({
   const c = m.admin.common
 
   const [name, setName] = useState(initial?.name ?? '')
-  const [slug, setSlug] = useState(initial?.slug ?? '')
   const [designation, setDesignation] = useState(initial?.designation ?? '')
   const [speciality, setSpeciality] = useState(initial?.speciality ?? '')
   const [qualifications, setQualifications] = useState(
@@ -60,7 +57,8 @@ export function DoctorForm({
     listToLines(initial?.expertise ?? []),
   )
   const [opd, setOpd] = useState(initial?.opd_timings ?? '')
-  const [photo, setPhoto] = useState(initial?.photo_filename ?? '')
+  // The photo is saved on its own (straight away), so it keeps its own copy of the doctor.
+  const [photoDoctor, setPhotoDoctor] = useState(initial)
   const [departmentIds, setDepartmentIds] = useState<Array<number>>(
     initial?.department_ids ?? [],
   )
@@ -97,7 +95,6 @@ export function DoctorForm({
         method: initial ? 'PUT' : 'POST',
         json: {
           name,
-          slug,
           designation,
           speciality,
           qualifications,
@@ -105,7 +102,6 @@ export function DoctorForm({
           achievements,
           expertise: linesToList(expertise),
           opd_timings: opd,
-          photo_filename: photo,
           department_ids: departmentIds,
           primary_department_id: primary,
           is_hidden: hidden,
@@ -119,10 +115,12 @@ export function DoctorForm({
       return
     }
     if (initial) {
-      if (result.data) setSlug(result.data.slug)
       setSaved(true)
-    } else {
-      await navigate({ to: '/admin/doctors' })
+    } else if (result.data) {
+      await navigate({
+        to: '/admin/doctors/$id',
+        params: { id: String(result.data.id) },
+      })
     }
   }
 
@@ -137,20 +135,13 @@ export function DoctorForm({
     else setMessage(result.message)
   }
 
-  // Keep a saved file selectable even if it was removed from the folder.
-  const photoFiles =
-    photo && !DOCTOR_PHOTOS.includes(photo)
-      ? [photo, ...DOCTOR_PHOTOS]
-      : DOCTOR_PHOTOS
-  const photoOptions = [
-    { value: '', label: t.photoNone },
-    ...photoFiles.map((file) => ({ value: file, label: file })),
-  ]
-
   return (
     <form className="admin-form stack" onSubmit={save} noValidate>
       {message || Object.keys(errors).length > 0 ? (
-        <FormAlert title={c.formErrorTitle} text={message || c.formErrorFix} />
+        <FormAlert
+          title={c.formErrorTitle}
+          text={Object.keys(errors).length > 0 ? c.formErrorFix : message}
+        />
       ) : null}
       {saved ? (
         <p className="admin-saved" role="status">
@@ -166,15 +157,6 @@ export function DoctorForm({
         error={errors.name}
         maxLength={160}
         required
-      />
-      <TextField
-        id="doc-slug"
-        label={c.slug}
-        hint={initial ? c.slugHintEdit : c.slugHintNew}
-        value={slug}
-        onChange={setSlug}
-        error={errors.slug}
-        maxLength={120}
       />
       <TextField
         id="doc-designation"
@@ -213,15 +195,11 @@ export function DoctorForm({
         rows={2}
         maxLength={300}
       />
-      <SelectField
-        id="doc-photo"
-        label={t.photo}
-        hint={t.photoHint}
-        value={photo}
-        onChange={setPhoto}
-        error={errors.photo_filename}
-        options={photoOptions}
-      />
+      {photoDoctor ? (
+        <PhotoUpload doctor={photoDoctor} onChange={setPhotoDoctor} />
+      ) : (
+        <p className="field__hint">{t.photoAfterSave}</p>
+      )}
 
       <CheckGroup
         legend={t.departments}
