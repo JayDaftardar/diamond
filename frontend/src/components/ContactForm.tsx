@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
-import { AlertIcon } from '#/components/Icon'
+import { CircleAlert, CircleCheck } from 'lucide-react'
+import { buttonClass } from '#/components/ui/button'
 import { API_PUBLIC_URL, EMERGENCY_PHONE } from '#/content/config'
 import { fmt, m } from '#/lib/i18n'
 
@@ -112,26 +113,38 @@ export function ContactForm() {
 
   if (status === 'success') {
     return (
-      <div className="form-result" ref={successBox} tabIndex={-1} role="status">
-        <h2>{m.contact.successTitle}</h2>
-        <p>{fmt(m.contact.successBody, phoneVars)}</p>
-        <button
-          type="button"
-          className="btn btn--quiet"
-          onClick={() => {
-            setValues({
-              name: '',
-              phone: '',
-              email: '',
-              message: '',
-              website: '',
-            })
-            setStatus('idle')
-            void loadToken()
-          }}
-        >
-          {m.contact.sendAnother}
-        </button>
+      <div
+        className="grid gap-4 rounded-2xl bg-white p-6 shadow-tile ring-1 ring-slate-200/70 focus:outline-none sm:p-8"
+        ref={successBox}
+        tabIndex={-1}
+        role="status"
+      >
+        <CircleCheck className="size-9 text-blue-600" aria-hidden="true" />
+        <h2 className="font-heading text-2xl font-semibold text-navy-950">
+          {m.contact.successTitle}
+        </h2>
+        <p className="text-lead text-slate-700">
+          {fmt(m.contact.successBody, phoneVars)}
+        </p>
+        <div>
+          <button
+            type="button"
+            className={buttonClass('soft')}
+            onClick={() => {
+              setValues({
+                name: '',
+                phone: '',
+                email: '',
+                message: '',
+                website: '',
+              })
+              setStatus('idle')
+              void loadToken()
+            }}
+          >
+            {m.contact.sendAnother}
+          </button>
+        </div>
       </div>
     )
   }
@@ -139,12 +152,19 @@ export function ContactForm() {
   const busy = status === 'submitting'
 
   return (
-    <form className="contact-form stack" onSubmit={submit} noValidate>
+    <form className="grid gap-5" onSubmit={submit} noValidate>
       {status === 'error' ? (
-        <div className="form-alert" ref={errorBox} tabIndex={-1} role="alert">
-          <AlertIcon />
+        <div
+          className="flex gap-3 rounded-xl bg-red-50 p-4 text-red-700 ring-1 ring-red-600/30 focus:outline-none"
+          ref={errorBox}
+          tabIndex={-1}
+          role="alert"
+        >
+          <CircleAlert className="mt-0.5 size-5 shrink-0" aria-hidden="true" />
           <div>
-            <strong>{m.contact.errorTitle}</strong>
+            <strong className="block font-semibold">
+              {m.contact.errorTitle}
+            </strong>
             <p>{formError}</p>
           </div>
         </div>
@@ -191,7 +211,10 @@ export function ContactForm() {
       />
 
       {/* Honeypot: invisible to people, tempting to bots. */}
-      <div className="hp-field" aria-hidden="true">
+      <div
+        className="absolute -left-[9999px] size-px overflow-hidden"
+        aria-hidden="true"
+      >
         <label htmlFor="contact-website">Website</label>
         <input
           id="contact-website"
@@ -204,17 +227,22 @@ export function ContactForm() {
         />
       </div>
 
-      <button
-        type="submit"
-        className="btn btn--primary"
-        disabled={busy}
-        aria-busy={busy}
-      >
-        {busy ? m.contact.sending : m.contact.send}
-      </button>
+      <div>
+        <button
+          type="submit"
+          className={buttonClass('primary', 'md', 'w-full sm:w-auto')}
+          disabled={busy}
+          aria-busy={busy}
+        >
+          {busy ? m.contact.sending : m.contact.send}
+        </button>
+      </div>
     </form>
   )
 }
+
+const control =
+  'w-full rounded-lg border-0 bg-white px-4 text-[1.0625rem] text-navy-950 ring-1 ring-slate-300 transition placeholder:text-slate-500 hover:ring-slate-400 focus:ring-2 focus:ring-blue-600 focus:outline-none aria-[invalid=true]:ring-2 aria-[invalid=true]:ring-red-600'
 
 interface TextFieldProps {
   field: Field
@@ -259,10 +287,12 @@ function TextField({
   } as const
 
   return (
-    <div className="field">
-      <label htmlFor={id}>{label}</label>
+    <div className="grid gap-2">
+      <label htmlFor={id} className="font-semibold text-navy-950">
+        {label}
+      </label>
       {hint ? (
-        <span className="field__hint" id={`${id}-hint`}>
+        <span className="text-[0.9375rem] text-slate-500" id={`${id}-hint`}>
           {hint}
         </span>
       ) : null}
@@ -271,6 +301,7 @@ function TextField({
           {...common}
           rows={6}
           maxLength={2000}
+          className={`${control} min-h-40 resize-y py-3`}
           onChange={(event) => onChange(field, event.target.value)}
         />
       ) : (
@@ -279,12 +310,16 @@ function TextField({
           type={type}
           inputMode={inputMode}
           maxLength={254}
+          className={`${control} h-12`}
           onChange={(event) => onChange(field, event.target.value)}
         />
       )}
       {error ? (
-        <p className="field__error" id={`${id}-error`}>
-          <AlertIcon />
+        <p
+          className="flex items-start gap-2 text-[0.9375rem] font-semibold text-red-600"
+          id={`${id}-error`}
+        >
+          <CircleAlert className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
           {error}
         </p>
       ) : null}

@@ -10,12 +10,15 @@ import { UtilityStrip } from './UtilityStrip'
 export function SiteLayout({ children }: { children: ReactNode }) {
   return (
     <>
-      <a className="skip-link" href="#main">
+      <a
+        className="absolute top-2 left-4 z-[100] -translate-y-[200%] rounded-lg bg-navy-950 px-4 py-3 font-semibold text-white focus:translate-y-0"
+        href="#main"
+      >
         {m.skip}
       </a>
       <UtilityStrip />
       <Header />
-      <main id="main" tabIndex={-1}>
+      <main id="main" tabIndex={-1} data-ui="" className="focus:outline-none">
         {children}
       </main>
       <Footer />

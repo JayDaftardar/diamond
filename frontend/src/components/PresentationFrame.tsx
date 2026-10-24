@@ -12,7 +12,7 @@ export function PresentationFrame({
   title: string
 }) {
   return (
-    <div className="video-frame">
+    <div className="relative aspect-video overflow-hidden rounded-2xl bg-white shadow-card ring-1 ring-slate-200">
       <iframe
         src={url}
         title={title}
@@ -20,6 +20,7 @@ export function PresentationFrame({
         sandbox="allow-scripts allow-same-origin allow-popups"
         referrerPolicy="no-referrer"
         allowFullScreen
+        className="absolute inset-0 size-full border-0"
       />
     </div>
   )

@@ -180,7 +180,7 @@ function Messages() {
             return (
               <li
                 key={submission.id}
-                className={`admin-row admin-row--message${submission.is_read ? '' : ' is-unread'}`}
+                className={`admin-row admin-row--message${submission.is_read ? '' : 'is-unread'}`}
               >
                 <button
                   type="button"

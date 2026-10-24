@@ -1,6 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { Breadcrumbs } from '#/components/Breadcrumbs'
-import { DoctorGrid } from '#/components/Doctor'
+import { Phone } from 'lucide-react'
+import { DoctorGrid } from '#/components/doctors/DoctorCard'
+import { PageHead } from '#/components/ui/PageHead'
+import { Container } from '#/components/ui/Section'
 import { EMERGENCY_PHONE } from '#/content/config'
 import { fetchDoctors } from '#/lib/api'
 import { breadcrumbJsonLd } from '#/lib/jsonld'
@@ -29,29 +31,26 @@ function Doctors() {
 
   return (
     <>
-      <section className="page-head wrap">
-        <Breadcrumbs
-          items={[{ label: m.nav.home, to: '/' }, { label: m.doctors.title }]}
-        />
-        <h1 data-rise="">{m.doctors.h1}</h1>
-        <p
-          className="statement"
-          data-rise=""
-          style={{ '--i': 1 } as React.CSSProperties}
-        >
-          {m.doctors.intro}
-        </p>
-      </section>
-      <section className="section">
-        <div
-          className="wrap stack"
-          style={{ '--stack': 'var(--s-5)' } as React.CSSProperties}
-        >
-          <p className="muted" data-rise="">
+      <PageHead
+        crumbs={[{ label: m.nav.home, to: '/' }, { label: m.doctors.title }]}
+        eyebrow={m.doctors.eyebrow}
+        title={m.doctors.h1}
+        intro={m.doctors.intro}
+      />
+      <section className="py-14 lg:py-20">
+        <Container>
+          <p
+            className="mb-10 flex max-w-3xl items-start gap-3 text-slate-700"
+            data-rise=""
+          >
+            <Phone
+              className="mt-1 size-4 shrink-0 text-blue-600"
+              aria-hidden="true"
+            />
             {fmt(m.home.doctorsNote, { number: EMERGENCY_PHONE.display })}
           </p>
           <DoctorGrid doctors={doctors} />
-        </div>
+        </Container>
       </section>
     </>
   )

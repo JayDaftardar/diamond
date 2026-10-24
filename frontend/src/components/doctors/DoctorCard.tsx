@@ -20,6 +20,52 @@ function initials(name: string) {
 }
 
 /**
+ * A doctor's portrait in a 4:5 frame, or their initials on pale blue until a photo is
+ * uploaded. The frame has no radius of its own: the parent clips it.
+ */
+export function DoctorPortrait({
+  doctor,
+  eager,
+  zoom,
+}: {
+  doctor: Pick<DoctorCardData, 'name' | 'designation' | 'photo_url'>
+  eager?: boolean
+  /** Slowly enlarge the photo while the parent (a card) is hovered. */
+  zoom?: boolean
+}) {
+  const src = doctorPhotoSrc(doctor.photo_url)
+  return (
+    <div className="aspect-[4/5] overflow-hidden bg-blue-50">
+      {src ? (
+        <img
+          src={src}
+          alt={fmt(m.doctors.photoAlt, {
+            name: doctor.name,
+            designation: doctor.designation,
+          })}
+          width={400}
+          height={500}
+          loading={eager ? 'eager' : 'lazy'}
+          decoding="async"
+          className={clsx(
+            'size-full object-cover',
+            zoom &&
+              'transition duration-700 ease-smooth group-hover:scale-[1.04] motion-reduce:transition-none motion-reduce:group-hover:scale-100',
+          )}
+        />
+      ) : (
+        <div
+          className="grid size-full place-items-center font-heading text-6xl font-semibold text-blue-600/35"
+          aria-hidden="true"
+        >
+          {initials(doctor.name)}
+        </div>
+      )}
+    </div>
+  )
+}
+
+/**
  * Doctor card: portrait, speciality, name, designation and an OPD box (with today's status
  * when the timings can be read). The whole card links to the profile.
  */
@@ -32,8 +78,6 @@ export function DoctorCard({
   eager?: boolean
   className?: string
 }) {
-  const src = doctorPhotoSrc(doctor.photo_url)
-
   return (
     <article
       className={clsx(
@@ -42,28 +86,8 @@ export function DoctorCard({
         className,
       )}
     >
-      <div className="aspect-[4/5] overflow-hidden rounded-xl bg-blue-50">
-        {src ? (
-          <img
-            src={src}
-            alt={fmt(m.doctors.photoAlt, {
-              name: doctor.name,
-              designation: doctor.designation,
-            })}
-            width={400}
-            height={500}
-            loading={eager ? 'eager' : 'lazy'}
-            decoding="async"
-            className="size-full object-cover transition duration-700 ease-smooth group-hover:scale-[1.04] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
-          />
-        ) : (
-          <div
-            className="grid size-full place-items-center font-heading text-6xl font-semibold text-blue-600/35"
-            aria-hidden="true"
-          >
-            {initials(doctor.name)}
-          </div>
-        )}
+      <div className="overflow-hidden rounded-xl">
+        <DoctorPortrait doctor={doctor} eager={eager} zoom />
       </div>
 
       <div className="flex flex-1 flex-col px-2.5 pt-5 pb-2">
@@ -205,5 +229,22 @@ export function DoctorRow({
         </div>
       )}
     </div>
+  )
+}
+
+/** Doctors in a responsive grid (used on the doctors, department and treatment pages). */
+export function DoctorGrid({ doctors }: { doctors: DoctorCardData[] }) {
+  return (
+    <ul className="grid list-none gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      {doctors.map((doctor, index) => (
+        <li
+          key={doctor.slug}
+          data-rise=""
+          style={{ '--i': index % 4 } as React.CSSProperties}
+        >
+          <DoctorCard doctor={doctor} eager={index < 4} />
+        </li>
+      ))}
+    </ul>
   )
 }

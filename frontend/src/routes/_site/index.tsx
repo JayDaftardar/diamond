@@ -11,6 +11,8 @@ import {
 import type { CSSProperties } from 'react'
 import { DoctorRow } from '#/components/doctors/DoctorCard'
 import { arrowLinkClass, buttonClass } from '#/components/ui/button'
+import { Closing } from '#/components/ui/Closing'
+import { InsurerTiles } from '#/components/ui/InsurerTiles'
 import {
   Accent,
   Container,
@@ -21,7 +23,6 @@ import {
   DIRECTIONS_URL,
   EMERGENCY_PHONE,
   HOSPITAL_PHOTOS,
-  INSURER_LOGOS,
 } from '#/content/config'
 import { fetchDepartments, fetchDoctors } from '#/lib/api'
 import { hospitalJsonLd } from '#/lib/jsonld'
@@ -69,7 +70,7 @@ function Home() {
   const { departments, doctors } = Route.useLoaderData()
 
   return (
-    <div data-ui="">
+    <>
       <Hero departmentCount={departments.length} />
       <Departments departments={departments} />
       {doctors.length > 0 ? (
@@ -101,8 +102,12 @@ function Home() {
       ) : null}
       <Cover />
       <Facilities />
-      <Closing />
-    </div>
+      <Closing
+        id="home-contact"
+        title={m.home.contactTitle}
+        body={m.home.contactBody}
+      />
+    </>
   )
 }
 
@@ -380,32 +385,7 @@ function Cover() {
             <p className="mt-2 text-[0.9375rem] text-slate-500">
               {fmt(m.home.insurersNote, { count: partners.length })}
             </p>
-            <ul
-              className="mt-5 grid list-none grid-cols-2 gap-2 sm:grid-cols-3"
-              aria-label={m.insurance.title}
-            >
-              {partners.map((name) => {
-                const logo = INSURER_LOGOS[name]
-                return (
-                  <li
-                    key={name}
-                    className="grid min-h-11 place-items-center rounded-md bg-blue-50 px-2 py-2 text-center text-[0.8125rem] leading-tight font-semibold text-navy-900"
-                  >
-                    {logo ? (
-                      <img
-                        src={`/images/insurers/${logo}`}
-                        alt={name}
-                        loading="lazy"
-                        decoding="async"
-                        className="max-h-7 w-auto"
-                      />
-                    ) : (
-                      name
-                    )}
-                  </li>
-                )
-              })}
-            </ul>
+            <InsurerTiles className="mt-5" />
           </div>
         </div>
       </Container>
@@ -490,46 +470,6 @@ function Facilities() {
             {m.home.facilitiesLink}
             <ArrowRight aria-hidden="true" />
           </Link>
-        </div>
-      </Container>
-    </section>
-  )
-}
-
-/* --------------------------------------------------------------- closing */
-
-function Closing() {
-  return (
-    <section aria-labelledby="home-contact" className="py-20 lg:py-24">
-      <Container>
-        <div className="grid items-center gap-8 rounded-3xl bg-blue-600 px-6 py-12 text-white sm:px-10 lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-12 lg:px-16 lg:py-16 [&_:focus-visible]:outline-white">
-          <div>
-            <h2
-              id="home-contact"
-              className="font-heading text-h2 font-semibold text-balance"
-              data-rise=""
-            >
-              {m.home.contactTitle}
-            </h2>
-            <p
-              className="mt-4 text-lead text-white/85"
-              data-rise=""
-              style={rise(1)}
-            >
-              {m.home.contactBody}
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-3" data-rise="" style={rise(2)}>
-            <a href={EMERGENCY_PHONE.href} className={buttonClass('light')}>
-              <Phone aria-hidden="true" />
-              <span className="whitespace-nowrap tabular-nums">
-                {fmt(m.home.callCta, { number: EMERGENCY_PHONE.display })}
-              </span>
-            </a>
-            <Link to="/contact" className={buttonClass('outline-light')}>
-              {m.home.contactMessage}
-            </Link>
-          </div>
         </div>
       </Container>
     </section>
