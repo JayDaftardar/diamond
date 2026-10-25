@@ -8,3 +8,7 @@ def test_health_and_security_headers():
     assert r.status_code == 200
     assert r.headers["x-content-type-options"] == "nosniff"
     assert r.headers["x-frame-options"] == "DENY"
+
+
+def test_health_answers_head_requests_for_uptime_monitors():
+    assert TestClient(app).head("/health").status_code == 200

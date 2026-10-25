@@ -57,7 +57,8 @@ def create_app() -> FastAPI:
     app.include_router(public.router)
     app.include_router(admin.router)
 
-    @app.get("/health")
+    # HEAD too: uptime monitors (UptimeRobot) probe with HEAD by default.
+    @app.api_route("/health", methods=["GET", "HEAD"])
     def health() -> dict[str, str]:
         return {"status": "ok"}
 
