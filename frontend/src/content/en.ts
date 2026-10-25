@@ -238,12 +238,12 @@ export const en = {
     facilitiesLead:
       'Round-the-clock emergency and critical care, operation theatres, diagnostics, pharmacy and ambulance, all at the hospital.',
     facilitiesPhotoAlt:
-      'Front of Diamond Hospital with its name sign, Kolhapur',
+      'Diamond Hospital building on Kasaba Bawada Main Road, Kolhapur',
     h1: 'Diamond Hospital, Kolhapur',
     lead: 'Multi-speciality hospital in Ramanmala, Kasaba Bawada, next to Mahaveer College. Emergency care, ICU, ICCU and OPD, open 24 hours.',
     callCta: 'Call {number}',
     directions: 'Get directions',
-    photoAlt: 'Diamond Hospital building on Kasaba Bawada Main Road, Kolhapur',
+    photoAlt: 'Front of Diamond Hospital with its name sign, Kolhapur',
     photoPlaceholder: 'Hospital building photo, to be supplied',
     emergencyTitle: 'Emergency 24×7',
     emergencyText: 'Call any of these numbers, day or night.',

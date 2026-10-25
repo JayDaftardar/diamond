@@ -200,18 +200,18 @@ function Hero({ departmentCount }: { departmentCount: number }) {
         </div>
 
         <div className="relative lg:pl-4">
-          {HOSPITAL_PHOTOS.front ? (
+          {HOSPITAL_PHOTOS.interior ? (
             <figure
               className="aspect-[5/4] overflow-hidden rounded-2xl bg-slate-100 shadow-float lg:aspect-[10/11]"
               data-settle=""
             >
               <img
-                src={`/images/hospital/${HOSPITAL_PHOTOS.front}`}
+                src={`/images/hospital/${HOSPITAL_PHOTOS.interior}`}
                 alt={m.home.photoAlt}
-                width={720}
-                height={480}
+                width={349}
+                height={454}
                 fetchPriority="high"
-                className="size-full object-cover object-[45%_center]"
+                className="size-full object-cover object-[center_35%]"
               />
             </figure>
           ) : (
@@ -402,19 +402,19 @@ function Facilities() {
       className="bg-navy-950 py-20 text-white lg:py-28 [&_:focus-visible]:outline-white"
     >
       <Container className="grid items-center gap-12 lg:grid-cols-[minmax(0,23rem)_minmax(0,1fr)] lg:gap-20">
-        {HOSPITAL_PHOTOS.interior ? (
+        {HOSPITAL_PHOTOS.front ? (
           <figure
             className="mx-auto aspect-[4/5] w-full max-w-sm overflow-hidden rounded-2xl bg-navy-900 lg:max-w-none"
             data-settle=""
           >
             <img
-              src={`/images/hospital/${HOSPITAL_PHOTOS.interior}`}
+              src={`/images/hospital/${HOSPITAL_PHOTOS.front}`}
               alt={m.home.facilitiesPhotoAlt}
-              width={349}
-              height={454}
+              width={720}
+              height={480}
               loading="lazy"
               decoding="async"
-              className="size-full object-cover"
+              className="size-full object-cover object-[40%_center]"
             />
           </figure>
         ) : null}
