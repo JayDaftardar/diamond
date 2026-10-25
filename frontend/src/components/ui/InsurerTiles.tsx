@@ -5,7 +5,7 @@ import { m } from '#/lib/i18n'
 /**
  * Insurance partners as small tiles. A tile shows the insurer's logo once its file is added
  * to public/images/insurers/ and listed in INSURER_LOGOS (content/config.ts); until then it
- * shows the insurer's name, so the list is complete from day one. Logo tiles are white, so
+ * shows the name on its own. The name is always written under the logo. Logo tiles are white, so
  * a logo with a white background (a JPG, say) sits cleanly on them.
  */
 export function InsurerTiles({ className }: { className?: string }) {
@@ -23,23 +23,30 @@ export function InsurerTiles({ className }: { className?: string }) {
           <li
             key={name}
             className={clsx(
-              'grid min-h-12 place-items-center rounded-md px-2 py-2 text-center text-[0.8125rem] leading-tight font-semibold',
-              logo
-                ? 'bg-white ring-1 ring-slate-200 ring-inset'
-                : 'bg-blue-50 text-navy-900',
+              'flex min-h-24 flex-col items-center justify-center gap-2 rounded-md px-2 py-3 text-center',
+              logo ? 'bg-white ring-1 ring-slate-200 ring-inset' : 'bg-blue-50',
             )}
           >
             {logo ? (
-              <img
-                src={`/images/insurers/${logo}`}
-                alt={name}
-                loading="lazy"
-                decoding="async"
-                className="max-h-8 w-auto max-w-full object-contain"
-              />
-            ) : (
-              name
-            )}
+              <span className="flex h-10 w-full items-center justify-center">
+                {/* The name is written below, so the picture itself needs no alt text. */}
+                <img
+                  src={`/images/insurers/${encodeURIComponent(logo)}`}
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                  className="max-h-10 w-auto max-w-[90%] rounded-[3px] object-contain"
+                />
+              </span>
+            ) : null}
+            <span
+              className={clsx(
+                'text-[0.8125rem] leading-tight font-semibold',
+                logo ? 'text-slate-700' : 'text-navy-900',
+              )}
+            >
+              {name}
+            </span>
           </li>
         )
       })}

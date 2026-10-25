@@ -106,7 +106,7 @@ export const en = {
 
   insurance: {
     title: 'Cashless insurance',
-    // Names only; logos are placeholders until supplied (public/images/insurers/).
+    // Names; each shows its logo when one is listed in INSURER_LOGOS (content/config.ts).
     partners: [
       'Acko',
       'Aditya Birla',
