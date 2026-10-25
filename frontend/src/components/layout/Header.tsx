@@ -31,7 +31,6 @@ export function Header() {
 
   return (
     <header
-      data-ui=""
       className={clsx(
         'sticky top-0 z-40 border-b bg-white transition-[box-shadow,border-color] duration-300',
         scrolled ? 'border-slate-200 shadow-card' : 'border-transparent',

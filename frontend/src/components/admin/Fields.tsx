@@ -1,5 +1,6 @@
+import { CircleAlert } from 'lucide-react'
 import type { ReactNode } from 'react'
-import { AlertIcon } from '#/components/Icon'
+import { checkboxControl, fieldControl } from '#/components/ui/field'
 
 interface BaseProps {
   id: string
@@ -7,6 +8,28 @@ interface BaseProps {
   hint?: string
   error?: string
   required?: boolean
+}
+
+const labelClass = 'font-semibold text-navy-950'
+const hintClass = 'text-[0.9375rem] text-slate-700'
+
+/** A field's own error message, in red with an icon (never colour alone). */
+export function FieldError({
+  id,
+  children,
+}: {
+  id?: string
+  children: ReactNode
+}) {
+  return (
+    <p
+      className="flex items-start gap-2 text-[0.9375rem] font-semibold text-red-700"
+      id={id}
+    >
+      <CircleAlert className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+      {children}
+    </p>
+  )
 }
 
 /** Label, optional hint, the control, and the field's own error message. */
@@ -18,20 +41,17 @@ function FieldShell({
   children,
 }: BaseProps & { children: ReactNode }) {
   return (
-    <div className="field">
-      <label htmlFor={id}>{label}</label>
+    <div className="grid min-w-0 gap-2">
+      <label htmlFor={id} className={labelClass}>
+        {label}
+      </label>
       {hint ? (
-        <span className="field__hint" id={`${id}-hint`}>
+        <span className={hintClass} id={`${id}-hint`}>
           {hint}
         </span>
       ) : null}
       {children}
-      {error ? (
-        <p className="field__error" id={`${id}-error`}>
-          <AlertIcon />
-          {error}
-        </p>
-      ) : null}
+      {error ? <FieldError id={`${id}-error`}>{error}</FieldError> : null}
     </div>
   )
 }
@@ -50,9 +70,18 @@ export function TextField(
     onChange: (value: string) => void
     maxLength?: number
     type?: string
+    autoComplete?: string
   },
 ) {
-  const { id, value, onChange, maxLength, type = 'text', required } = props
+  const {
+    id,
+    value,
+    onChange,
+    maxLength,
+    type = 'text',
+    required,
+    autoComplete,
+  } = props
   return (
     <FieldShell {...props}>
       <input
@@ -61,6 +90,8 @@ export function TextField(
         value={value}
         maxLength={maxLength}
         required={required}
+        autoComplete={autoComplete}
+        className={`${fieldControl} h-12`}
         aria-invalid={props.error ? true : undefined}
         aria-describedby={describedBy(props)}
         onChange={(event) => onChange(event.target.value)}
@@ -86,6 +117,7 @@ export function TextAreaField(
         value={value}
         maxLength={maxLength}
         required={required}
+        className={`${fieldControl} resize-y py-3`}
         aria-invalid={props.error ? true : undefined}
         aria-describedby={describedBy(props)}
         onChange={(event) => onChange(event.target.value)}
@@ -108,6 +140,7 @@ export function SelectField(
         id={id}
         value={value}
         required={required}
+        className={`${fieldControl} h-12 cursor-pointer`}
         aria-invalid={props.error ? true : undefined}
         aria-describedby={describedBy(props)}
         onChange={(event) => onChange(event.target.value)}
@@ -135,16 +168,11 @@ export function CheckGroup({
   children: ReactNode
 }) {
   return (
-    <fieldset className="check-group">
-      <legend>{legend}</legend>
-      {hint ? <p className="field__hint">{hint}</p> : null}
-      <div className="check-group__items">{children}</div>
-      {error ? (
-        <p className="field__error">
-          <AlertIcon />
-          {error}
-        </p>
-      ) : null}
+    <fieldset className="grid min-w-0 gap-2 border-0 p-0">
+      <legend className={`${labelClass} mb-1 p-0`}>{legend}</legend>
+      {hint ? <p className={hintClass}>{hint}</p> : null}
+      <div className="mt-1 grid gap-x-6 gap-y-1 sm:grid-cols-2">{children}</div>
+      {error ? <FieldError>{error}</FieldError> : null}
     </fieldset>
   )
 }
@@ -159,9 +187,10 @@ export function Check({
   onChange: (checked: boolean) => void
 }) {
   return (
-    <label className="check">
+    <label className="flex min-h-11 cursor-pointer items-center gap-3 text-slate-700">
       <input
         type="checkbox"
+        className={checkboxControl}
         checked={checked}
         onChange={(event) => onChange(event.target.checked)}
       />

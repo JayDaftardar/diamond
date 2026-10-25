@@ -9,10 +9,7 @@ import { m } from '#/lib/i18n'
  */
 export function UtilityStrip() {
   return (
-    <div
-      data-ui=""
-      className="bg-red-600 text-[0.8125rem] font-semibold text-white"
-    >
+    <div className="bg-red-600 text-[0.8125rem] font-semibold text-white">
       <Container className="flex min-h-9 items-center justify-between gap-6 py-1.5">
         <p className="flex min-w-0 items-center gap-2">
           <Phone className="size-3.5 shrink-0" aria-hidden="true" />

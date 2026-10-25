@@ -14,7 +14,7 @@ export function Footer() {
   return (
     <footer
       data-site-footer=""
-      data-ui=""
+
       className="bg-navy-950 text-white/80 [&_:focus-visible]:outline-white"
     >
       <Container className="grid gap-12 pt-16 pb-12 md:grid-cols-2 lg:grid-cols-[1.35fr_1fr_0.75fr_1.5fr] lg:gap-10 lg:pt-20">

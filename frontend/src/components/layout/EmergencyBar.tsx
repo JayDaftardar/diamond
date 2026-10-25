@@ -26,7 +26,6 @@ export function EmergencyBar() {
 
   return (
     <aside
-      data-ui=""
       className={clsx(
         'fixed inset-x-0 bottom-0 z-50 flex min-h-[3.75rem] items-center justify-between gap-4 bg-red-600 px-4 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] text-white shadow-float sm:px-6 lg:hidden',
         'transition-transform duration-300 ease-smooth motion-reduce:transition-none',

@@ -29,7 +29,7 @@ export function MobileNav() {
 
       <dialog
         ref={dialog}
-        data-ui=""
+
         className={clsx(
           'mr-0 ml-auto h-dvh max-h-dvh w-[min(22rem,88vw)] max-w-none bg-white p-0 shadow-float',
           'backdrop:bg-navy-950/50 open:flex open:animate-slide-in open:flex-col motion-reduce:open:animate-none lg:hidden',

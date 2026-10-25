@@ -1,6 +1,13 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
-import { AdminHead, FormAlert, StatusTag } from '#/components/admin/AdminUi'
+import {
+  AdminHead,
+  EmptyNote,
+  FormAlert,
+  StatusTag,
+  adminRowClass,
+} from '#/components/admin/AdminUi'
+import { buttonClass } from '#/components/ui/button'
 import { doctorInput } from '#/components/admin/DoctorForm'
 import { adminJson, loadAdmin } from '#/lib/admin'
 import type { Department, Doctor } from '#/lib/admin'
@@ -77,43 +84,46 @@ function Doctors() {
         title={t.title}
         intro={t.intro}
         action={
-          <Link to="/admin/doctors/new" className="btn btn--primary">
+          <Link to="/admin/doctors/new" className={buttonClass('primary')}>
             {t.add}
           </Link>
         }
       />
       {error ? <FormAlert title={c.formErrorTitle} text={error} /> : null}
       {items.length === 0 ? (
-        <p className="empty-note">{c.empty}</p>
+        <EmptyNote>{c.empty}</EmptyNote>
       ) : (
-        <ol className="admin-list">
+        <ol className="grid list-none gap-3">
           {items.map((doctor, index) => (
-            <li key={doctor.id} className="admin-row">
-              <div className="admin-row__main">
+            <li key={doctor.id} className={adminRowClass}>
+              <div className="grid min-w-0 flex-1 basis-64 gap-0.5">
                 <Link
                   to="/admin/doctors/$id"
                   params={{ id: String(doctor.id) }}
+                  className="font-semibold text-navy-950 transition-colors hover:text-blue-600"
                 >
                   {doctor.name}
                 </Link>
-                <span className="muted small">{doctor.designation}</span>
-                <span className="muted small">
+                <span className="text-[0.9375rem] text-slate-700">
+                  {doctor.designation}
+                </span>
+                <span className="text-[0.9375rem] text-slate-700">
                   {doctor.department_ids
                     .map((id) => departmentName.get(id))
                     .filter(Boolean)
                     .join(', ')}
                 </span>
-                <span className="muted small">
+                <span className="text-[0.9375rem] text-slate-700">
                   {doctor.opd_timings ?? t.noOpd}
                 </span>
               </div>
               <StatusTag tone={doctor.is_hidden ? 'hidden' : 'public'}>
                 {doctor.is_hidden ? c.hiddenLabel : c.visibleLabel}
               </StatusTag>
-              <div className="admin-row__actions">
+              <div className="flex flex-wrap gap-2">
                 <button
                   type="button"
-                  className="btn btn--quiet"
+                  className={buttonClass('quiet', 'sm')}
                   disabled={busy || index === 0}
                   onClick={() => void move(index, -1)}
                 >
@@ -121,7 +131,7 @@ function Doctors() {
                 </button>
                 <button
                   type="button"
-                  className="btn btn--quiet"
+                  className={buttonClass('quiet', 'sm')}
                   disabled={busy || index === items.length - 1}
                   onClick={() => void move(index, 1)}
                 >
@@ -129,7 +139,7 @@ function Doctors() {
                 </button>
                 <button
                   type="button"
-                  className="btn btn--quiet"
+                  className={buttonClass('quiet', 'sm')}
                   disabled={busy}
                   onClick={() => void toggle(doctor)}
                 >

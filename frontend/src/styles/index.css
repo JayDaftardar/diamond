@@ -1,26 +1,21 @@
 /*
  * Site stylesheet: Tailwind CSS v4 with the Diamond Hospital design tokens.
- *
- * During the redesign the previous stylesheets live in ./legacy and load in their own
- * layer, placed after Tailwind's reset and before its utilities: pages not yet redesigned
- * keep their look, and Tailwind classes always win where both apply. Each page's legacy
- * rules are deleted once that page is redesigned.
+ * Every colour, font, size, shadow and motion value comes from the @theme block below.
  */
-@layer theme, base, legacy, components, utilities;
-
 @import 'tailwindcss';
-@import './legacy/index.css' layer(legacy);
 
 /* Fonts, self-hosted. Domine for headings, Source Serif 4 Italic for the one accent word
    in a heading, Mukta for everything else (Mukta and Domine both suit Marathi later). */
 @import '@fontsource/domine/latin-600.css';
 @import '@fontsource/domine/latin-700.css';
 @import '@fontsource/source-serif-4/latin-600-italic.css';
+@import '@fontsource/mukta/latin-400.css';
 @import '@fontsource/mukta/latin-500.css';
+@import '@fontsource/mukta/latin-600.css';
+@import '@fontsource/mukta/latin-700.css';
 
-/* Styles admin-written text (treatment and department descriptions). Named `richtext`, not
-   `prose`, so it never meets the legacy admin editor's own `.prose` class. The option name
-   is case-sensitive: keep it out of the formatter's reach. */
+/* Styles admin-written text (treatment and department descriptions). The option name is
+   case-sensitive: keep it out of the formatter's reach. */
 /* prettier-ignore */
 @plugin '@tailwindcss/typography' {
   className: richtext;
@@ -122,52 +117,35 @@
   }
 }
 
-@layer components {
-  /* These sit here, not in `base`, because the legacy layer (for the admin) comes after
-     `base` and would override them. */
+@layer base {
   html {
     scroll-padding-top: 6rem; /* room for the sticky header when jumping to a section */
   }
-  ::selection {
-    background-color: var(--color-blue-600);
-    color: var(--color-white);
-  }
-  /* Redesigned areas (every public page) get the new body text; the admin keeps its own. */
-  [data-ui] {
+  body {
+    background-color: var(--color-white);
     color: var(--color-slate-700);
     font-family: var(--font-body);
     font-size: var(--text-body);
     line-height: var(--text-body--line-height);
     -webkit-font-smoothing: antialiased;
   }
+  ::selection {
+    background-color: var(--color-blue-600);
+    color: var(--color-white);
+  }
+}
 
-  /* One focus ring everywhere (beats the legacy one; a utility can still change it). */
+@layer components {
+  /* One focus ring everywhere; a utility (a field's own ring) can still change it. */
   :focus-visible {
     outline: 3px solid var(--color-blue-600);
     outline-offset: 3px;
   }
-
-  /* Redesigned areas carry data-ui. Inside them the legacy link underline is switched
-     off; links that want one use the underline utilities. (Removed with the legacy CSS.) */
-  :where([data-ui]) a {
-    text-decoration-line: none;
-  }
-  :where([data-ui]) :where(ul, ol) {
-    padding: 0;
-    list-style: none;
-  }
-  :where([data-ui]) p {
-    max-width: none;
-  }
-  :where([data-ui]) :where(h1, h2, h3, h4) {
-    font: inherit;
-    letter-spacing: inherit;
-    text-wrap: inherit;
-  }
 }
 
 /* ---- Entrances: the parts of a section arrive in reading order, once ----
-   Entrances.tsx adds `is-in` as an element scrolls into view. The hidden state only exists
+   Entrances.tsx adds `is-in` as an element scrolls into view; the inline script in
+   __root.tsx reveals what is already on screen straight away. The hidden state only exists
    under html.js and without reduced motion, so content is always visible when scripts are
    off or movement is switched off. */
 @media (prefers-reduced-motion: no-preference) {
@@ -200,8 +178,8 @@
   }
 }
 
-/* Admin-written text: our colours for every part. The plugin sets grey defaults of its own
-   on the same class, so these live in the last layer to be sure they win. */
+/* Admin-written text: our colours for every part. The typography plugin sets grey defaults
+   of its own on the same class, so these live in the last layer to be sure they win. */
 @layer utilities {
   .richtext {
     --tw-prose-body: var(--color-slate-700);

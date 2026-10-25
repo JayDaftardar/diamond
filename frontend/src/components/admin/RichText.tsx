@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { FieldError } from './Fields'
 import { m } from '#/lib/i18n'
 
 interface RichTextProps {
@@ -63,22 +64,33 @@ export function RichText({
   ]
 
   return (
-    <div className="field">
-      <span id={`${id}-label`} className="field__label">
+    <div className="grid min-w-0 gap-2">
+      <span id={`${id}-label`} className="font-semibold text-navy-950">
         {label}
       </span>
       {hint ? (
-        <span className="field__hint" id={`${id}-hint`}>
+        <span className="text-[0.9375rem] text-slate-700" id={`${id}-hint`}>
           {hint}
         </span>
       ) : null}
-      <div className="rich" data-invalid={error ? '' : undefined}>
-        <div className="rich__tools" role="toolbar" aria-label={t.label}>
+      <div
+        className={
+          'overflow-hidden rounded-lg bg-white ring-1 transition focus-within:ring-2 focus-within:ring-blue-600 ' +
+          (error
+            ? 'ring-2 ring-red-600'
+            : 'ring-slate-300 hover:ring-slate-500')
+        }
+      >
+        <div
+          className="flex flex-wrap gap-1.5 border-b border-slate-200 bg-slate-50 p-2"
+          role="toolbar"
+          aria-label={t.label}
+        >
           {tools.map((tool) => (
             <button
               key={tool.label}
               type="button"
-              className="rich__tool"
+              className="min-h-9 rounded-md bg-white px-3 text-[0.9375rem] font-semibold text-navy-950 ring-1 ring-slate-300 transition ring-inset hover:bg-blue-50 hover:ring-blue-600"
               // Keep the text selection while a toolbar button is pressed.
               onMouseDown={(event) => event.preventDefault()}
               onClick={tool.run}
@@ -90,7 +102,7 @@ export function RichText({
         <div
           id={id}
           ref={editor}
-          className="rich__area prose"
+          className="richtext max-h-[32rem] min-h-48 max-w-none overflow-y-auto px-4 py-3 focus:outline-none richtext-headings:font-heading richtext-headings:font-semibold"
           contentEditable
           role="textbox"
           aria-multiline="true"
@@ -101,7 +113,7 @@ export function RichText({
           onBlur={emit}
         />
       </div>
-      {error ? <p className="field__error">{error}</p> : null}
+      {error ? <FieldError>{error}</FieldError> : null}
     </div>
   )
 }

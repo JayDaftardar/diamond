@@ -1,5 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
-import { AlertIcon, PlusIcon } from '#/components/Icon'
+import { Plus } from 'lucide-react'
+import { buttonClass } from '#/components/ui/button'
+import { fieldControl } from '#/components/ui/field'
+import { FieldError } from './Fields'
 import { fmt, m } from '#/lib/i18n'
 
 /**
@@ -77,22 +80,22 @@ export function LinkList({
   }
 
   return (
-    <fieldset className="check-group link-list">
-      <legend>{legend}</legend>
-      <p className="field__hint" id={`${id}-hint`}>
+    <fieldset className="grid min-w-0 justify-items-start gap-3 border-0 p-0">
+      <legend className="mb-1 p-0 font-semibold text-navy-950">{legend}</legend>
+      <p className="text-[0.9375rem] text-slate-700" id={`${id}-hint`}>
         {fmt(hint, { max: String(max) })}
       </p>
-      <ol className="link-list__items" ref={list}>
+      <ol className="grid w-full list-none gap-3" ref={list}>
         {values.map((value, index) => {
           const slotId = `${id}-${keys[index]}`
           const label = fmt(slotLabel, { n: String(index + 1) })
           const error = slotErrors[`${name}.${index}`]
           return (
-            <li key={keys[index]} className="field">
-              <label htmlFor={slotId} className="visually-hidden">
+            <li key={keys[index]} className="grid min-w-0 gap-2">
+              <label htmlFor={slotId} className="sr-only">
                 {label}
               </label>
-              <div className="link-list__row">
+              <div className="flex items-stretch gap-2">
                 <input
                   id={slotId}
                   type="url"
@@ -100,6 +103,7 @@ export function LinkList({
                   placeholder="https://"
                   value={value}
                   maxLength={maxLength}
+                  className={`${fieldControl} h-12 min-w-0 flex-1`}
                   aria-invalid={error ? true : undefined}
                   aria-describedby={error ? `${slotId}-error` : `${id}-hint`}
                   onChange={(event) =>
@@ -113,7 +117,7 @@ export function LinkList({
                 {values.length > 1 || value ? (
                   <button
                     type="button"
-                    className="btn btn--quiet"
+                    className={buttonClass('quiet', 'sm', 'h-12 shrink-0')}
                     aria-label={fmt(t.removeSlotLabel, { label })}
                     onClick={() => remove(index)}
                   >
@@ -122,24 +126,20 @@ export function LinkList({
                 ) : null}
               </div>
               {error ? (
-                <p className="field__error" id={`${slotId}-error`}>
-                  <AlertIcon />
-                  {error}
-                </p>
+                <FieldError id={`${slotId}-error`}>{error}</FieldError>
               ) : null}
             </li>
           )
         })}
       </ol>
-      {listError ? (
-        <p className="field__error">
-          <AlertIcon />
-          {listError}
-        </p>
-      ) : null}
+      {listError ? <FieldError>{listError}</FieldError> : null}
       {values.length < max ? (
-        <button type="button" className="btn btn--quiet" onClick={add}>
-          <PlusIcon />
+        <button
+          type="button"
+          className={buttonClass('quiet', 'sm')}
+          onClick={add}
+        >
+          <Plus aria-hidden="true" />
           {addLabel}
         </button>
       ) : null}

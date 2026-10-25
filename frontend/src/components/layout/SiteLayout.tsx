@@ -18,7 +18,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
       </a>
       <UtilityStrip />
       <Header />
-      <main id="main" tabIndex={-1} data-ui="" className="focus:outline-none">
+      <main id="main" tabIndex={-1} className="focus:outline-none">
         {children}
       </main>
       <Footer />

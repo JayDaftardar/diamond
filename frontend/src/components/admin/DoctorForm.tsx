@@ -1,10 +1,11 @@
 import { useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import type { FormEvent } from 'react'
+import { buttonClass } from '#/components/ui/button'
 import { adminJson, linesToList, listToLines } from '#/lib/admin'
 import type { Department, Doctor } from '#/lib/admin'
 import { m } from '#/lib/i18n'
-import { DeleteButton, FormAlert } from './AdminUi'
+import { DeleteButton, FormAlert, SavedNote, adminFormClass } from './AdminUi'
 import { PhotoUpload } from './PhotoUpload'
 import {
   Check,
@@ -136,18 +137,14 @@ export function DoctorForm({
   }
 
   return (
-    <form className="admin-form stack" onSubmit={save} noValidate>
+    <form className={adminFormClass} onSubmit={save} noValidate>
       {message || Object.keys(errors).length > 0 ? (
         <FormAlert
           title={c.formErrorTitle}
           text={Object.keys(errors).length > 0 ? c.formErrorFix : message}
         />
       ) : null}
-      {saved ? (
-        <p className="admin-saved" role="status">
-          {c.saved}
-        </p>
-      ) : null}
+      {saved ? <SavedNote>{c.saved}</SavedNote> : null}
 
       <TextField
         id="doc-name"
@@ -198,7 +195,7 @@ export function DoctorForm({
       {photoDoctor ? (
         <PhotoUpload doctor={photoDoctor} onChange={setPhotoDoctor} />
       ) : (
-        <p className="field__hint">{t.photoAfterSave}</p>
+        <p className="text-[0.9375rem] text-slate-700">{t.photoAfterSave}</p>
       )}
 
       <CheckGroup
@@ -260,8 +257,12 @@ export function DoctorForm({
       />
       <Check label={c.hiddenLabel} checked={hidden} onChange={setHidden} />
 
-      <div className="admin-actions">
-        <button className="btn btn--primary" type="submit" disabled={busy}>
+      <div className="flex flex-wrap items-start gap-3 border-t border-slate-200 pt-6">
+        <button
+          className={buttonClass('primary')}
+          type="submit"
+          disabled={busy}
+        >
           {busy ? c.saving : initial ? c.save : c.create}
         </button>
         {initial ? (

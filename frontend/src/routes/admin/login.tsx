@@ -1,7 +1,9 @@
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import type { FormEvent } from 'react'
-import { AlertIcon } from '#/components/Icon'
+import { FormAlert } from '#/components/admin/AdminUi'
+import { TextField } from '#/components/admin/Fields'
+import { buttonClass } from '#/components/ui/button'
 import { adminFetch, fetchMe } from '#/lib/admin'
 import { m } from '#/lib/i18n'
 
@@ -60,44 +62,42 @@ function Login() {
   }
 
   return (
-    <main className="admin-login">
-      <form className="admin-card stack" onSubmit={submit} noValidate>
+    <main className="grid min-h-dvh place-items-center bg-slate-50 px-4 py-10">
+      <form
+        className="grid w-full max-w-md gap-6 rounded-2xl bg-white p-6 shadow-card ring-1 ring-slate-200/70 sm:p-8"
+        onSubmit={submit}
+        noValidate
+      >
         <div>
-          <h1>{m.admin.title}</h1>
-          <p className="muted">{m.admin.loginIntro}</p>
+          <h1 className="font-heading text-[1.75rem] leading-tight font-semibold text-navy-950">
+            {m.admin.title}
+          </h1>
+          <p className="mt-2 text-slate-700">{m.admin.loginIntro}</p>
         </div>
-        {error ? (
-          <div className="form-alert" role="alert">
-            <AlertIcon />
-            <div>
-              <strong>{m.admin.errorTitle}</strong>
-              <p>{error}</p>
-            </div>
-          </div>
-        ) : null}
-        <div className="field">
-          <label htmlFor="admin-email">{m.admin.email}</label>
-          <input
-            id="admin-email"
-            type="email"
-            autoComplete="username"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            required
-          />
-        </div>
-        <div className="field">
-          <label htmlFor="admin-password">{m.admin.password}</label>
-          <input
-            id="admin-password"
-            type="password"
-            autoComplete="current-password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            required
-          />
-        </div>
-        <button className="btn btn--primary" type="submit" disabled={busy}>
+        {error ? <FormAlert title={m.admin.errorTitle} text={error} /> : null}
+        <TextField
+          id="admin-email"
+          label={m.admin.email}
+          type="email"
+          autoComplete="username"
+          value={email}
+          onChange={setEmail}
+          required
+        />
+        <TextField
+          id="admin-password"
+          label={m.admin.password}
+          type="password"
+          autoComplete="current-password"
+          value={password}
+          onChange={setPassword}
+          required
+        />
+        <button
+          className={buttonClass('primary', 'md', 'w-full')}
+          type="submit"
+          disabled={busy}
+        >
           {busy ? m.admin.signingIn : m.admin.signIn}
         </button>
       </form>

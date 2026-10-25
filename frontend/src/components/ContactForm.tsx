@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import { CircleAlert, CircleCheck } from 'lucide-react'
 import { buttonClass } from '#/components/ui/button'
+import { fieldControl } from '#/components/ui/field'
 import { API_PUBLIC_URL, EMERGENCY_PHONE } from '#/content/config'
 import { fmt, m } from '#/lib/i18n'
 
@@ -241,9 +242,6 @@ export function ContactForm() {
   )
 }
 
-const control =
-  'w-full rounded-lg border-0 bg-white px-4 text-[1.0625rem] text-navy-950 ring-1 ring-slate-300 transition placeholder:text-slate-500 hover:ring-slate-500 focus:ring-2 focus:ring-blue-600 focus:outline-none aria-[invalid=true]:ring-2 aria-[invalid=true]:ring-red-600'
-
 interface TextFieldProps {
   field: Field
   label: string
@@ -301,7 +299,7 @@ function TextField({
           {...common}
           rows={6}
           maxLength={2000}
-          className={`${control} min-h-40 resize-y py-3`}
+          className={`${fieldControl} min-h-40 resize-y py-3`}
           onChange={(event) => onChange(field, event.target.value)}
         />
       ) : (
@@ -310,7 +308,7 @@ function TextField({
           type={type}
           inputMode={inputMode}
           maxLength={254}
-          className={`${control} h-12`}
+          className={`${fieldControl} h-12`}
           onChange={(event) => onChange(field, event.target.value)}
         />
       )}

@@ -3,6 +3,12 @@
 Source of truth for content: `info.md`. Design rules: `ui.md` (palette) and `skills.md` (design process).
 Where those files and the project brief disagree, the brief wins (noted inline).
 
+> **Visual design update (redesign branch):** the look described in sections on typography,
+> colour and components below was replaced. The frontend now uses Tailwind CSS v4 with the
+> token sheet in `frontend/src/styles/index.css` (Domine headings, Source Serif 4 italic for
+> the accent word, Mukta text; navy, sapphire, soft blue and crimson). Structure, content,
+> routes, data and behaviour in this plan are unchanged. See `REDESIGN.md`.
+
 ---
 
 ## 1. Subject, audience, primary job

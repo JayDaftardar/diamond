@@ -2,10 +2,14 @@ import { Link, createFileRoute } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import {
   AdminHead,
+  EmptyNote,
   FormAlert,
   Pager,
   StatusTag,
+  adminRowClass,
 } from '#/components/admin/AdminUi'
+import { buttonClass } from '#/components/ui/button'
+import { fieldControl } from '#/components/ui/field'
 import { SelectField } from '#/components/admin/Fields'
 import { adminJson, loadAdmin } from '#/lib/admin'
 import type {
@@ -96,17 +100,17 @@ function Treatments() {
             : t.intro
         }
         action={
-          <Link to="/admin/treatments/new" className="btn btn--primary">
+          <Link to="/admin/treatments/new" className={buttonClass('primary')}>
             {t.add}
           </Link>
         }
       />
-      <p className="muted">{t.intro}</p>
+      <p className="mb-6 max-w-2xl text-slate-700">{t.intro}</p>
       {error ? <FormAlert title={c.formErrorTitle} text={error} /> : null}
 
-      <div className="admin-filters">
+      <div className="mb-6 grid gap-4 rounded-2xl bg-white p-5 shadow-tile ring-1 ring-slate-200/70 md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)] md:items-end">
         <form
-          className="admin-search"
+          className="flex min-w-0 gap-2"
           role="search"
           onSubmit={(event) => {
             event.preventDefault()
@@ -114,7 +118,7 @@ function Treatments() {
             setPage(1)
           }}
         >
-          <label className="visually-hidden" htmlFor="tr-search">
+          <label className="sr-only" htmlFor="tr-search">
             {t.searchLabel}
           </label>
           <input
@@ -122,9 +126,13 @@ function Treatments() {
             type="search"
             placeholder={t.searchLabel}
             value={query}
+            className={`${fieldControl} h-12 min-w-0 flex-1`}
             onChange={(event) => setQuery(event.target.value)}
           />
-          <button type="submit" className="btn btn--quiet">
+          <button
+            type="submit"
+            className={buttonClass('quiet', 'sm', 'h-12 shrink-0')}
+          >
             {c.search}
           </button>
         </form>
@@ -159,27 +167,30 @@ function Treatments() {
       </div>
 
       {data === null ? null : data.items.length === 0 ? (
-        <p className="empty-note">{c.noResults}</p>
+        <EmptyNote>{c.noResults}</EmptyNote>
       ) : (
-        <ul className="admin-list">
+        <ul className="grid list-none gap-3">
           {data.items.map((item) => (
-            <li key={item.id} className="admin-row">
-              <div className="admin-row__main">
+            <li key={item.id} className={adminRowClass}>
+              <div className="grid min-w-0 flex-1 basis-64 gap-0.5">
                 <Link
                   to="/admin/treatments/$id"
                   params={{ id: String(item.id) }}
+                  className="font-semibold text-navy-950 transition-colors hover:text-blue-600"
                 >
                   {item.title}
                 </Link>
-                <span className="muted small">{item.department.name}</span>
+                <span className="text-[0.9375rem] text-slate-700">
+                  {item.department.name}
+                </span>
               </div>
               <StatusTag tone={item.status}>
                 {statusLabel[item.status]}
               </StatusTag>
-              <div className="admin-row__actions">
+              <div className="flex flex-wrap gap-2">
                 <button
                   type="button"
-                  className="btn btn--quiet"
+                  className={buttonClass('quiet', 'sm')}
                   disabled={busy}
                   onClick={() => void toggle(item)}
                 >

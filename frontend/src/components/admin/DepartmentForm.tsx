@@ -1,10 +1,11 @@
 import { useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import type { FormEvent } from 'react'
+import { buttonClass } from '#/components/ui/button'
 import { adminJson } from '#/lib/admin'
 import type { Department } from '#/lib/admin'
 import { m } from '#/lib/i18n'
-import { DeleteButton, FormAlert } from './AdminUi'
+import { DeleteButton, FormAlert, SavedNote, adminFormClass } from './AdminUi'
 import { Check, TextAreaField, TextField } from './Fields'
 import { RichText } from './RichText'
 
@@ -67,18 +68,14 @@ export function DepartmentForm({ initial }: { initial?: Department }) {
   }
 
   return (
-    <form className="admin-form stack" onSubmit={save} noValidate>
+    <form className={adminFormClass} onSubmit={save} noValidate>
       {message || Object.keys(errors).length > 0 ? (
         <FormAlert
           title={c.formErrorTitle}
           text={Object.keys(errors).length > 0 ? c.formErrorFix : message}
         />
       ) : null}
-      {saved ? (
-        <p className="admin-saved" role="status">
-          {c.saved}
-        </p>
-      ) : null}
+      {saved ? <SavedNote>{c.saved}</SavedNote> : null}
 
       <TextField
         id="dept-name"
@@ -109,8 +106,12 @@ export function DepartmentForm({ initial }: { initial?: Department }) {
       />
       <Check label={c.hiddenLabel} checked={hidden} onChange={setHidden} />
 
-      <div className="admin-actions">
-        <button className="btn btn--primary" type="submit" disabled={busy}>
+      <div className="flex flex-wrap items-start gap-3 border-t border-slate-200 pt-6">
+        <button
+          className={buttonClass('primary')}
+          type="submit"
+          disabled={busy}
+        >
           {busy ? c.saving : initial ? c.save : c.create}
         </button>
         {initial ? (

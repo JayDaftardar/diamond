@@ -1,10 +1,11 @@
 import { Link, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import type { FormEvent } from 'react'
+import { buttonClass } from '#/components/ui/button'
 import { adminJson } from '#/lib/admin'
 import type { Department, Doctor, Treatment } from '#/lib/admin'
 import { m } from '#/lib/i18n'
-import { DeleteButton, FormAlert } from './AdminUi'
+import { DeleteButton, FormAlert, SavedNote, adminFormClass } from './AdminUi'
 import { Check, CheckGroup, SelectField, TextField } from './Fields'
 import { LinkList } from './LinkList'
 import { RichText } from './RichText'
@@ -99,7 +100,7 @@ export function TreatmentForm({
   }
 
   return (
-    <form className="admin-form stack" onSubmit={save} noValidate>
+    <form className={adminFormClass} onSubmit={save} noValidate>
       {message || Object.keys(errors).length > 0 ? (
         <FormAlert
           title={c.formErrorTitle}
@@ -107,14 +108,18 @@ export function TreatmentForm({
         />
       ) : null}
       {saved ? (
-        <p className="admin-saved" role="status">
+        <SavedNote>
           {c.saved}{' '}
           {initial ? (
-            <Link to="/treatments/$slug" params={{ slug }}>
+            <Link
+              to="/treatments/$slug"
+              params={{ slug }}
+              className="underline underline-offset-4 hover:text-blue-600"
+            >
               {t.viewOnSite}
             </Link>
           ) : null}
-        </p>
+        </SavedNote>
       ) : null}
 
       <TextField
@@ -194,8 +199,12 @@ export function TreatmentForm({
       </CheckGroup>
       <Check label={c.hiddenLabel} checked={hidden} onChange={setHidden} />
 
-      <div className="admin-actions">
-        <button className="btn btn--primary" type="submit" disabled={busy}>
+      <div className="flex flex-wrap items-start gap-3 border-t border-slate-200 pt-6">
+        <button
+          className={buttonClass('primary')}
+          type="submit"
+          disabled={busy}
+        >
           {busy ? c.saving : initial ? c.save : c.create}
         </button>
         {initial ? (

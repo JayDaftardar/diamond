@@ -1,4 +1,5 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
+import { AdminHead, FormAlert } from '#/components/admin/AdminUi'
 import { adminFetch } from '#/lib/admin'
 import type { Dashboard } from '#/lib/admin'
 import { fmt, m } from '#/lib/i18n'
@@ -18,9 +19,9 @@ function DashboardPage() {
 
   return (
     <>
-      <h1>{m.admin.dashboardTitle}</h1>
+      <AdminHead title={m.admin.dashboardTitle} />
       {data ? (
-        <ul className="card-grid admin-stats">
+        <ul className="grid list-none gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Stat
             to="/admin/submissions"
             label={t.submissions}
@@ -57,7 +58,7 @@ function DashboardPage() {
           />
         </ul>
       ) : (
-        <p role="alert">{m.admin.loadError}</p>
+        <FormAlert title={m.admin.errorTitle} text={m.admin.loadError} />
       )}
     </>
   )
@@ -79,12 +80,18 @@ function Stat({
   detail: string
 }) {
   return (
-    <li className="card admin-stat">
-      <Link to={to} className="admin-stat__label">
+    <li className="group relative grid gap-1 rounded-2xl bg-white p-6 shadow-tile ring-1 ring-slate-200/70 transition duration-300 ease-smooth hover:-translate-y-1 hover:shadow-card motion-reduce:transition-none motion-reduce:hover:translate-y-0">
+      {/* The label is the link; it stretches over the whole card. */}
+      <Link
+        to={to}
+        className="text-eyebrow font-bold text-blue-600 uppercase after:absolute after:inset-0 after:rounded-2xl focus-visible:outline-none focus-visible:after:outline-3 focus-visible:after:outline-offset-3 focus-visible:after:outline-blue-600"
+      >
         {label}
       </Link>
-      <strong className="admin-stat__value">{value}</strong>
-      <span className="muted small">{detail}</span>
+      <strong className="font-heading text-[2.5rem] leading-none font-semibold text-navy-950 tabular-nums">
+        {value}
+      </strong>
+      <span className="text-[0.9375rem] text-slate-700">{detail}</span>
     </li>
   )
 }

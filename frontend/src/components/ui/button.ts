@@ -6,6 +6,8 @@ export type ButtonVariant =
   | 'soft' // pale blue: a second action next to a primary one
   | 'light' // white: on a sapphire or navy ground
   | 'outline-light' // white outline: second action on a dark ground
+  | 'quiet' // white with a grey outline: everyday actions in the admin
+  | 'danger' // red outline: deleting, nothing else
 
 const VARIANTS: Record<ButtonVariant, string> = {
   primary: 'bg-blue-600 text-white shadow-tile hover:bg-blue-700',
@@ -14,6 +16,10 @@ const VARIANTS: Record<ButtonVariant, string> = {
   light: 'bg-white text-navy-950 hover:bg-blue-50',
   'outline-light':
     'text-white ring-1 ring-white/45 ring-inset hover:bg-white/10 hover:ring-white',
+  quiet:
+    'bg-white text-navy-950 ring-1 ring-slate-300 ring-inset hover:bg-slate-50 hover:ring-slate-500',
+  danger:
+    'bg-white text-red-700 ring-1 ring-red-600/50 ring-inset hover:bg-red-600 hover:text-white hover:ring-red-600',
 }
 
 const SIZES = {
@@ -35,6 +41,7 @@ export function buttonClass(
   return clsx(
     'group inline-flex items-center justify-center gap-2.5 rounded-lg py-2 text-center leading-snug font-semibold',
     'transition duration-200 ease-smooth active:scale-[0.98] motion-reduce:transition-none motion-reduce:active:scale-100',
+    'disabled:pointer-events-none disabled:opacity-50',
     '[&_svg]:size-[1.15em] [&_svg]:shrink-0',
     VARIANTS[variant],
     SIZES[size],
