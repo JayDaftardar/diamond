@@ -1,20 +1,27 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { clsx } from 'clsx'
 import { useEffect, useState } from 'react'
+import type { ReactNode } from 'react'
 import {
   AdminHead,
   DeleteButton,
+  EmptyNote,
   FormAlert,
   Pager,
   StatusTag,
 } from '#/components/admin/AdminUi'
+import { buttonClass } from '#/components/ui/button'
+import { fieldControl } from '#/components/ui/field'
 import { adminJson, formatDateTime } from '#/lib/admin'
 import type { Submission, SubmissionPage } from '#/lib/admin'
 import { fmt, m } from '#/lib/i18n'
+import { freshData } from '#/lib/freshData'
 
 type Filter = 'all' | 'unread' | 'read'
 
 export const Route = createFileRoute('/_admin/admin/submissions/')({
   ssr: false,
+  ...freshData,
   component: Messages,
 })
 
@@ -128,13 +135,18 @@ function Messages() {
       />
       {error ? <FormAlert title={c.formErrorTitle} text={error} /> : null}
 
-      <div className="admin-filters">
-        <div className="segmented" role="group" aria-label={c.filter}>
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl bg-white p-5 shadow-tile ring-1 ring-slate-200/70">
+        <div
+          className="inline-flex overflow-hidden rounded-lg ring-1 ring-slate-300 ring-inset"
+          role="group"
+          aria-label={c.filter}
+        >
           {filters.map((item) => (
             <button
               key={item.key}
               type="button"
               aria-pressed={filter === item.key}
+              className="min-h-11 px-4 font-semibold text-slate-700 transition-colors hover:bg-blue-50 aria-pressed:bg-navy-950 aria-pressed:text-white"
               onClick={() => {
                 setFilter(item.key)
                 setPage(1)
@@ -145,7 +157,7 @@ function Messages() {
           ))}
         </div>
         <form
-          className="admin-search"
+          className="flex min-w-0 basis-full gap-2 sm:max-w-md sm:flex-1 sm:basis-72"
           role="search"
           onSubmit={(event) => {
             event.preventDefault()
@@ -153,7 +165,7 @@ function Messages() {
             setPage(1)
           }}
         >
-          <label className="visually-hidden" htmlFor="msg-search">
+          <label className="sr-only" htmlFor="msg-search">
             {t.searchLabel}
           </label>
           <input
@@ -161,81 +173,86 @@ function Messages() {
             type="search"
             placeholder={t.searchLabel}
             value={query}
+            className={`${fieldControl} h-12 min-w-0 flex-1`}
             onChange={(event) => setQuery(event.target.value)}
           />
-          <button type="submit" className="btn btn--quiet">
+          <button
+            type="submit"
+            className={buttonClass('quiet', 'sm', 'h-12 shrink-0')}
+          >
             {c.search}
           </button>
         </form>
       </div>
 
       {data === null ? null : data.items.length === 0 ? (
-        <p className="empty-note">
+        <EmptyNote>
           {search || filter !== 'all' ? c.noResults : t.empty}
-        </p>
+        </EmptyNote>
       ) : (
-        <ul className="admin-list">
+        <ul className="grid list-none gap-3">
           {data.items.map((submission) => {
             const isOpen = open === submission.id
             return (
               <li
                 key={submission.id}
-                className={`admin-row admin-row--message${submission.is_read ? '' : ' is-unread'}`}
+                className={clsx(
+                  'min-w-0 overflow-hidden rounded-xl bg-white shadow-tile ring-1 ring-slate-200/70',
+                  !submission.is_read && 'border-l-4 border-blue-600',
+                )}
               >
                 <button
                   type="button"
-                  className="admin-row__toggle"
+                  className="flex w-full min-w-0 flex-wrap items-center gap-x-5 gap-y-1 px-5 py-4 text-left transition-colors hover:bg-slate-50"
                   aria-expanded={isOpen}
                   onClick={() => void toggle(submission)}
                 >
-                  <span className="admin-row__main">
-                    <strong>{submission.name}</strong>
-                    <span className="muted small">
+                  <span className="grid basis-full gap-0.5 sm:basis-56">
+                    <strong className="text-navy-950">{submission.name}</strong>
+                    <span className="text-[0.9375rem] text-slate-700">
                       {formatDateTime(submission.created_at)}
                     </span>
                   </span>
-                  <span className="admin-row__preview">
+                  <span className="min-w-0 flex-1 basis-full truncate text-slate-700 sm:basis-40">
                     {submission.message}
                   </span>
                   {submission.is_read ? null : (
-                    <StatusTag tone="draft">{t.unread}</StatusTag>
+                    <StatusTag tone="unread">{t.unread}</StatusTag>
                   )}
                 </button>
                 {isOpen ? (
-                  <div className="admin-message">
-                    <dl className="admin-facts">
-                      <div>
-                        <dt>{t.from}</dt>
-                        <dd>{submission.name}</dd>
-                      </div>
-                      <div>
-                        <dt>{t.phone}</dt>
-                        <dd>
-                          <a href={`tel:${submission.phone}`}>
-                            {submission.phone}
-                          </a>
-                        </dd>
-                      </div>
+                  <div className="grid gap-5 border-t border-slate-200 px-5 py-5">
+                    <dl className="grid gap-x-8 gap-y-3 sm:grid-cols-2">
+                      <Fact label={t.from}>{submission.name}</Fact>
+                      <Fact label={t.phone}>
+                        <a
+                          href={`tel:${submission.phone}`}
+                          className="font-semibold text-blue-600 hover:underline"
+                        >
+                          {submission.phone}
+                        </a>
+                      </Fact>
                       {submission.email ? (
-                        <div>
-                          <dt>{t.email}</dt>
-                          <dd>
-                            <a href={`mailto:${submission.email}`}>
-                              {submission.email}
-                            </a>
-                          </dd>
-                        </div>
+                        <Fact label={t.email}>
+                          <a
+                            href={`mailto:${submission.email}`}
+                            className="font-semibold break-all text-blue-600 hover:underline"
+                          >
+                            {submission.email}
+                          </a>
+                        </Fact>
                       ) : null}
-                      <div>
-                        <dt>{t.received}</dt>
-                        <dd>{formatDateTime(submission.created_at)}</dd>
-                      </div>
+                      <Fact label={t.received}>
+                        {formatDateTime(submission.created_at)}
+                      </Fact>
                     </dl>
-                    <p className="admin-message__text">{submission.message}</p>
-                    <div className="admin-actions">
+                    <p className="rounded-xl bg-slate-50 p-4 break-words whitespace-pre-wrap text-navy-950">
+                      {submission.message}
+                    </p>
+                    <div className="flex flex-wrap items-start gap-3">
                       <button
                         type="button"
-                        className="btn btn--quiet"
+                        className={buttonClass('quiet', 'sm')}
                         disabled={busy}
                         onClick={() =>
                           void setRead(submission, !submission.is_read)
@@ -258,5 +275,17 @@ function Messages() {
       )}
       <Pager page={page} pages={pages} onPage={setPage} />
     </>
+  )
+}
+
+/** One labelled detail of a message (sender, phone, email, time). */
+function Fact({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div className="min-w-0">
+      <dt className="text-eyebrow font-bold text-blue-600 uppercase">
+        {label}
+      </dt>
+      <dd className="mt-0.5 text-navy-950">{children}</dd>
+    </div>
   )
 }

@@ -1,8 +1,10 @@
 import { useRef, useState } from 'react'
 import type { ChangeEvent } from 'react'
-import { AlertIcon } from '#/components/Icon'
+import { buttonClass } from '#/components/ui/button'
 import { doctorPhotoSrc } from '#/components/Doctor'
 import { adminJson } from '#/lib/admin'
+import { FieldError } from './Fields'
+import { SavedNote } from './AdminUi'
 import type { Doctor } from '#/lib/admin'
 import { fmt, m } from '#/lib/i18n'
 
@@ -67,34 +69,37 @@ export function PhotoUpload({
   }
 
   return (
-    <div className="photo-upload">
-      <span className="field__label" id="doc-photo-label">
+    <div className="grid gap-2">
+      <span className="font-semibold text-navy-950" id="doc-photo-label">
         {t.photo}
       </span>
-      <div className="photo-upload__body">
-        <div className="photo-upload__preview">
+      <div className="flex flex-wrap items-start gap-x-6 gap-y-4">
+        <div className="grid aspect-[4/5] w-40 place-items-center overflow-hidden rounded-xl bg-blue-50 p-2 text-center ring-1 ring-slate-200 has-[img]:p-0">
           {src ? (
             <img
               src={src}
               alt={fmt(t.photoAlt, { name: doctor.name })}
               width={160}
               height={200}
+              className="size-full object-cover"
             />
           ) : (
-            <span className="muted small">{t.photoNone}</span>
+            <span className="text-[0.9375rem] text-slate-700">
+              {t.photoNone}
+            </span>
           )}
         </div>
-        <div className="photo-upload__controls">
-          <p className="field__hint" id="doc-photo-hint">
+        <div className="grid min-w-0 flex-1 basis-64 gap-3">
+          <p className="text-[0.9375rem] text-slate-700" id="doc-photo-hint">
             {t.photoHint}
           </p>
-          <div className="button-row">
+          <div className="flex flex-wrap gap-3">
             {/* The real file input stays in the page (keyboard and screen readers reach it);
                 the button just opens it. */}
             <input
               ref={input}
               id="doc-photo"
-              className="visually-hidden"
+              className="sr-only"
               type="file"
               accept={ACCEPT}
               aria-labelledby="doc-photo-label"
@@ -103,7 +108,7 @@ export function PhotoUpload({
             />
             <button
               type="button"
-              className="btn btn--quiet"
+              className={buttonClass('quiet', 'sm')}
               disabled={busy}
               onClick={() => input.current?.click()}
             >
@@ -112,7 +117,7 @@ export function PhotoUpload({
             {src ? (
               <button
                 type="button"
-                className="btn btn--danger"
+                className={buttonClass('danger', 'sm')}
                 disabled={busy}
                 onClick={() => void remove()}
               >
@@ -120,17 +125,8 @@ export function PhotoUpload({
               </button>
             ) : null}
           </div>
-          {notice ? (
-            <p className="admin-saved" role="status">
-              {notice}
-            </p>
-          ) : null}
-          {error ? (
-            <p className="field__error" role="alert">
-              <AlertIcon />
-              {error}
-            </p>
-          ) : null}
+          {notice ? <SavedNote>{notice}</SavedNote> : null}
+          {error ? <FieldError>{error}</FieldError> : null}
         </div>
       </div>
     </div>

@@ -32,31 +32,31 @@ def test_slugs_unique_and_readable(db):
     assert slugify("Cardiology & CVTS") == "cardiology-and-cvts"
 
 
-def test_seeded_treatments_are_drafts_not_public(db):
+def test_seeded_treatments_are_public_even_without_text(db):
     seed_content(db)
-    assert _public_treatment_count(db) == 0
+    assert _public_treatment_count(db) == 89
 
 
-def test_treatment_goes_public_only_with_real_content_and_visible_dept(db):
+def test_treatment_is_hidden_by_its_own_flag_or_its_department(db):
     seed_content(db)
     t = db.scalar(select(Treatment).where(Treatment.slug == "coronary-angiography"))
 
-    t.description_html = "<p>&nbsp; </p>"  # tags and spaces only is still a draft
+    t.description_html = "<p>&nbsp; </p>"  # no real text: still shown
     db.commit()
-    assert _public_treatment_count(db) == 0
+    assert _public_treatment_count(db) == 89
 
     t.description_html = "<p>An imaging test of the heart arteries.</p>"
     db.commit()
-    assert _public_treatment_count(db) == 1
+    assert _public_treatment_count(db) == 89
 
     t.is_hidden = True
     db.commit()
-    assert _public_treatment_count(db) == 0
+    assert _public_treatment_count(db) == 88
 
     t.is_hidden = False
-    t.department.is_hidden = True  # hidden department hides its treatments
+    t.department.is_hidden = True  # hidden department hides all its treatments (3)
     db.commit()
-    assert _public_treatment_count(db) == 0
+    assert _public_treatment_count(db) == 86
 
 
 def test_hidden_doctor_and_department_filters(db):

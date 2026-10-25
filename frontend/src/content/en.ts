@@ -20,7 +20,7 @@ export const en = {
       'Diamond Hospital in Ramanmala, Kolhapur: 24-hour emergency care, OPD, ICU, Cath Lab and cashless insurance, including Ayushman Bharat (PM-JAY).',
     titleSuffix: 'Diamond Hospital, Kolhapur',
     homeTitle:
-      'Diamond Hospital, Kolhapur | 24�7 Emergency, OPD and Cashless Insurance',
+      'Diamond Hospital, Kolhapur | 24×7 Emergency, OPD and Cashless Insurance',
   },
 
   address: {
@@ -62,6 +62,11 @@ export const en = {
     barLabel: 'Emergency helpline',
     headerLabel: 'Emergency 24×7',
     allNumbers: 'Emergency and enquiries',
+    /** The thin red strip above the header. */
+    stripNumbers: 'Emergency 24×7',
+    stripAyushman: 'Ayushman Bharat PM-JAY empanelled',
+    stripCashless: 'Cashless insurance',
+    stripOpen: 'Open 24 hours, every day',
   },
 
   footer: {
@@ -101,7 +106,7 @@ export const en = {
 
   insurance: {
     title: 'Cashless insurance',
-    // Names only; logos are placeholders until supplied (public/images/insurers/).
+    // Names; each shows its logo when one is listed in INSURER_LOGOS (content/config.ts).
     partners: [
       'Acko',
       'Aditya Birla',
@@ -164,25 +169,81 @@ export const en = {
 
   faq: {
     title: 'Common questions',
+    intro:
+      'Quick answers about visiting, insurance and emergencies. If yours is not here, call {number}.',
+    // Answers use only facts from the hospital's information sheet. {number} is the main line.
     items: [
       {
         q: 'Is cashless insurance available?',
-        a: 'Yes. Diamond Hospital supports multiple insurance providers through empanelled TPAs.',
+        a: 'Yes. Diamond Hospital works with many insurance companies through empanelled TPAs (the insurers’ claim administrators), so eligible patients can be treated on a cashless basis. Cover and approval depend on your own policy, so please call {number} to check your insurer and policy before admission.',
       },
-      { q: 'Is Ayushman Bharat accepted?', a: 'Yes.' },
-      { q: 'What are the hospital timings?', a: 'Open 24×7.' },
-      { q: 'Is the hospital wheelchair accessible?', a: 'Yes.' },
-      { q: 'Is OPD available?', a: 'Yes.' },
-      { q: 'Are emergency services available?', a: 'Yes, 24×7.' },
+      {
+        q: 'Is Ayushman Bharat accepted?',
+        a: 'Yes. Diamond Hospital is empanelled under Ayushman Bharat Pradhan Mantri Jan Arogya Yojana (PM-JAY), which provides health insurance cover up to ₹5 lakh. Who is eligible, and which procedures are covered, is decided by the scheme. Please call {number} and we will help you check your case.',
+      },
+      {
+        q: 'What are the hospital timings?',
+        a: 'The hospital is open 24 hours a day, every day, and emergency services are always available. OPD timings are different for each doctor: they are shown on every doctor’s page, and we suggest calling {number} to confirm before you travel.',
+      },
+      {
+        q: 'Is OPD available?',
+        a: 'Yes. OPD is available with specialist doctors across the departments. Each doctor’s page lists their OPD days and hours, and shows whether they are in OPD right now.',
+      },
+      {
+        q: 'Are emergency services available?',
+        a: 'Yes, 24×7. Call {number} at any hour. The hospital has an ICU, an ICCU, a Cath Lab and operation theatres, and ambulance services are available.',
+      },
+      {
+        q: 'Is the hospital wheelchair accessible?',
+        a: 'Yes, the hospital is wheelchair friendly. If the patient or someone with them needs extra help, please call {number} before you arrive so the team can assist.',
+      },
+      {
+        q: 'Are tests and a pharmacy available at the hospital?',
+        a: 'Yes. The hospital has radiology, a pathology laboratory and a pharmacy, so many tests and medicines can be taken care of during the same visit.',
+      },
+      {
+        q: 'Where is the hospital?',
+        a: 'Ramanmala, Kasaba Bawada Main Road, next to Mahaveer College, Kolhapur, Maharashtra 416003. Use the directions link on this site to open the route in your maps app.',
+      },
     ],
   },
 
   home: {
+    // Hero: the heading is a statement; the hospital's name leads the paragraph under it.
+    heroEyebrow: 'A venture of Kolhapur Super Speciality Medical Centre',
+    heroTitleStart: 'Advanced treatment,',
+    heroTitleAccent: 'compassionate',
+    heroTitleEnd: 'care.',
+    heroLead:
+      'Diamond Hospital is a multi-speciality hospital in Ramanmala, Kolhapur, next to Mahaveer College. Emergency care, ICU, ICCU, Cath Lab and OPD, open 24 hours.',
+    emergencyCta: 'Emergency {number}',
+    exploreDepartments: 'Explore departments',
+    facts: 'At a glance',
+    factDepartments: 'Specialist departments',
+    factEmergencyValue: '24×7',
+    factEmergency: 'Emergency, ICU and ICCU',
+    factCoverValue: '₹5 lakh',
+    factCover: 'Ayushman Bharat cover',
+    floatTitle: 'Cath Lab, ICU and ICCU',
+    floatText: 'Critical and cardiac care on site',
+    departmentsHeading: 'Specialist care across {count} departments',
+    departmentsLead:
+      'From emergency and critical care to surgery and diagnostics, in one hospital. Choose a department to see its doctors and treatments.',
+    doctorsEyebrow: 'Our doctors',
+    doctorsHeading: 'Meet our specialists',
+    previousDoctors: 'Previous doctors',
+    nextDoctors: 'Next doctors',
+    coverEyebrow: 'PM-JAY empanelled · Cashless',
+    insurersNote: '{count} insurance providers, through empanelled TPAs.',
+    facilitiesLead:
+      'Round-the-clock emergency and critical care, operation theatres, diagnostics, pharmacy and ambulance, all at the hospital.',
+    facilitiesPhotoAlt:
+      'Diamond Hospital building on Kasaba Bawada Main Road, Kolhapur',
     h1: 'Diamond Hospital, Kolhapur',
     lead: 'Multi-speciality hospital in Ramanmala, Kasaba Bawada, next to Mahaveer College. Emergency care, ICU, ICCU and OPD, open 24 hours.',
     callCta: 'Call {number}',
     directions: 'Get directions',
-    photoAlt: 'Diamond Hospital building on Kasaba Bawada Main Road, Kolhapur',
+    photoAlt: 'Front of Diamond Hospital with its name sign, Kolhapur',
     photoPlaceholder: 'Hospital building photo, to be supplied',
     emergencyTitle: 'Emergency 24×7',
     emergencyText: 'Call any of these numbers, day or night.',
@@ -225,7 +286,18 @@ export const en = {
     insuranceIntro:
       'Diamond Hospital supports multiple insurance providers through empanelled TPAs.',
     insuranceCheck: 'To check whether your policy is covered, call {number}.',
+    scrollRegion: 'Insurance partners, a list you can scroll',
     ctaTitle: 'Questions about your visit?',
+    ctaBody:
+      'Call us at any hour, or send a message and we will get back to you.',
+    eyebrow: 'About the hospital',
+    overviewEyebrow: 'Our story',
+    facilitiesEyebrow: 'What we offer',
+    facilitiesIntro:
+      'Emergency care, critical care, surgery, diagnostics and a pharmacy, all under one roof.',
+    ayushmanEyebrow: 'Government scheme',
+    insuranceEyebrow: 'Cashless insurance',
+    faqEyebrow: 'FAQ',
   },
 
   doctors: {
@@ -233,6 +305,7 @@ export const en = {
     description:
       'Doctors at Diamond Hospital, Kolhapur: designation, speciality and OPD timings. Open a profile for qualifications and areas of expertise.',
     h1: 'Our doctors',
+    eyebrow: 'Our doctors',
     intro:
       'Find a doctor, their speciality and OPD timings. Open a profile for full details.',
     opdLabel: 'OPD',
@@ -260,7 +333,7 @@ export const en = {
     h1: 'Departments and treatments',
     intro: 'Choose a department, or search every treatment.',
     searchLabel: 'Search treatments',
-    searchPlaceholder: 'Search treatments, e.g. cataract',
+    searchPlaceholder: 'Search, e.g. cataract',
     searchButton: 'Search',
     tabsLabel: 'Departments',
     all: 'All',
@@ -281,6 +354,9 @@ export const en = {
       'Detailed treatment pages for {name} are being added. To ask about a procedure, call {number}.',
     doctorsTitle: 'Doctors in {name}',
     allTreatmentsTitle: 'All treatments',
+    eyebrow: 'Departments and treatments',
+    introEyebrow: 'About this department',
+    scrollTabs: 'Scroll to see more departments',
     emptyAll:
       'Treatment pages are being added. Choose a department to see its doctors, or call {number}.',
   },
@@ -301,6 +377,14 @@ export const en = {
     doctors: 'Doctors for this treatment',
     backTo: 'Back to {name}',
     callToAsk: 'To ask about this treatment, call {number}.',
+    noDescription:
+      'Detailed information about {title} is being added. To ask about this treatment, call {number}.',
+    metaFallback:
+      '{title} at Diamond Hospital, Kolhapur, in the {department} department. To ask about this treatment, call {number}.',
+    eyebrow: 'Treatment',
+    askTitle: 'Have a question about this treatment?',
+    department: 'Department',
+    mediaEyebrow: 'Watch and read',
   },
 
   contact: {
@@ -342,6 +426,13 @@ export const en = {
       'Could not reach the server. Check your connection and try again.',
     errorSummary: 'Please correct the highlighted fields.',
     mapTitle: 'Map showing the location of Diamond Hospital in Kolhapur',
+    eyebrow: 'Contact us',
+    emergencyTitle: 'Emergency and enquiries',
+    emergencyText: 'Call any of these numbers, day or night.',
+    findUsTitle: 'Find us',
+    formEyebrow: 'Send a message',
+    formIntro:
+      'Leave your details and your question. We will get back to you; for anything urgent, call.',
   },
 
   error: {
@@ -401,7 +492,7 @@ export const en = {
       submissions: 'Contact messages',
       unread: '{count} unread',
       treatments: 'Treatments',
-      treatmentsDetail: '{public} public, {draft} draft, {hidden} hidden',
+      treatmentsDetail: '{public} public, {hidden} hidden',
       doctors: 'Doctors',
       departments: 'Departments',
       visibility: '{public} public, {hidden} hidden',
@@ -473,7 +564,7 @@ export const en = {
     treatments: {
       title: 'Treatments',
       intro:
-        'A treatment appears on the website once it has a description and is not hidden.',
+        'Every treatment appears on the website unless it is hidden. One without a description shows a short note that details are being added.',
       add: 'Add treatment',
       newTitle: 'New treatment',
       editTitle: 'Edit treatment',
@@ -481,15 +572,13 @@ export const en = {
       department: 'Department',
       status: 'Status',
       statusPublic: 'Public',
-      statusDraft: 'Draft (no description)',
       statusHidden: 'Hidden',
       statusPublicShort: 'Public',
-      statusDraftShort: 'Draft',
       statusHiddenShort: 'Hidden',
       titleField: 'Title',
       description: 'Description',
       descriptionHint:
-        'Leave empty to keep this treatment as a draft. It will not show on the website until it has text.',
+        'Optional. The treatment shows on the website either way; without text its page says that details are being added.',
       youtube: 'YouTube videos',
       youtubeHint:
         'Paste the full link of each video. Only the video ID is saved. Shown in this order, up to {max}.',

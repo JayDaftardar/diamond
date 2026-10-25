@@ -3,6 +3,12 @@
 Source of truth for content: `info.md`. Design rules: `ui.md` (palette) and `skills.md` (design process).
 Where those files and the project brief disagree, the brief wins (noted inline).
 
+> **Visual design update (redesign branch):** the look described in sections on typography,
+> colour and components below was replaced. The frontend now uses Tailwind CSS v4 with the
+> token sheet in `frontend/src/styles/index.css` (Domine headings, Source Serif 4 italic for
+> the accent word, Mukta text; navy, sapphire, soft blue and crimson). Structure, content,
+> routes, data and behaviour in this plan are unchanged. See `REDESIGN.md`.
+
 ---
 
 ## 1. Subject, audience, primary job
@@ -327,7 +333,8 @@ treatments
   youtube_video_ids JSONB list (bare 11-char ids, admin's order, max 10)
   presentation_urls JSONB list (normalised embed links, admin's order, max 10)
   is_hidden BOOL · timestamps
-  -- "draft" is DERIVED: description_html empty (after stripping tags) → draft
+  -- every treatment is public unless is_hidden (or its department is hidden); an empty
+  -- description_html is allowed and the page then says details are being added
 
 treatment_doctors   (treatment_id, doctor_id) composite PK   -- 0..n linked doctors
 
@@ -361,7 +368,7 @@ Search: Postgres `ILIKE` over title (fine at ~100 treatments); `pg_trgm` index i
 
 ### 6.2 Admin API (`/api/v1/admin/...`, session required)
 - `auth/login`, `auth/logout`, `auth/me`
-- `dashboard` → unread submissions, treatments (public/draft/hidden), doctors, departments
+- `dashboard` → unread submissions, treatments (public/hidden), doctors, departments
 - `submissions` → list (newest first, `?read=`, `?from=&to=`, `?q=`, paginated),
   get, PATCH read/unread, DELETE
 - `treatments`, `doctors`, `departments` → CRUD + hide/show; departments `PATCH /reorder`
@@ -452,7 +459,7 @@ minimum tap targets, alt text on every image (doctor name + designation).
 ### 7.5 Admin UI
 Same tokens, denser layout. Login → dashboard tiles (counts) → sidebar: Messages
 (unread badge), Treatments, Doctors, Departments. Tables with search/filter, status pills
-(Public / Draft / Hidden), confirm-before-delete dialogs, unsaved-changes warning,
+(Public / Hidden), confirm-before-delete dialogs, unsaved-changes warning,
 inline YouTube/presentation preview after validation, drag-free reorder (up/down buttons,
 keyboard accessible).
 
@@ -472,7 +479,8 @@ keyboard accessible).
   `Physician` per doctor, `MedicalProcedure` per treatment, `BreadcrumbList` on inner pages.
   **No `aggregateRating`.**
 - `sitemap.xml` and `robots.txt` generated per request from the public-visibility helper, so
-  hidden and draft items never appear. `lastmod` from `updated_at`.
+  hidden items never appear, and treatments with no description yet are left out (they are
+  also `noindex`) until they have text. `lastmod` from `updated_at`.
 - `/admin` sends `X-Robots-Tag: noindex` and is not listed in robots.txt (which would advertise it).
 
 ---
@@ -482,7 +490,7 @@ keyboard accessible).
 - **14 departments** in info.md order, with curated slugs (`cardiology`, `ent`,
   `critical-care-internal-medicine`, `neuro-surgery`, …).
 - **Treatments:** ENT 25, Urology 36 (info.md says 37, but the list has 36: Q4), Ophthalmology 21,
-  Neurology 2, Gastroenterology 2, Cardiology 3 → all **draft** (title only).
+  Neurology 2, Gastroenterology 2, Cardiology 3 → all public from the start (title only; descriptions are added in the admin).
   "Cardiology" treatments map to the "Cardiology & CVTS" department.
 - **5 doctors** with designation, speciality, qualifications, training, expertise, OPD
   timings where given ("Call to confirm OPD timings" otherwise), photo placeholders,

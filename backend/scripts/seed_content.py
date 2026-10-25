@@ -1,4 +1,4 @@
-"""Seed departments, doctors and draft treatments from seed/hospital_seed.py.
+"""Seed departments, doctors and treatments (names only) from seed/hospital_seed.py.
 
 Safe to re-run: existing rows (matched by slug) are left untouched, so admin edits are
 never overwritten. Usage:  uv run python -m scripts.seed_content
@@ -28,7 +28,7 @@ def seed_content(db: Session) -> dict[str, int]:
         by_slug[slug] = dept
     db.flush()
 
-    # Treatments: names only, no description, so they are drafts.
+    # Treatments: names only; descriptions are added in the admin.
     for dept_slug, titles in TREATMENTS.items():
         dept = by_slug[dept_slug]
         for title in titles:

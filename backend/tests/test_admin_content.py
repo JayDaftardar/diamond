@@ -68,14 +68,15 @@ def test_create_treatment_sanitises_and_stores_only_the_video_id(admin_client, d
     assert public["youtube_video_ids"] == ["dQw4w9WgXcQ"]
 
 
-def test_treatment_without_description_is_a_draft_and_not_public(admin_client, db):
+def test_treatment_without_description_is_public_with_no_text(admin_client, db):
     seed_content(db)
     r = admin_client.post(
         f"{A}/treatments", json=treatment_payload(db, description_html="<p> </p>")
     )
     assert r.status_code == 201
-    assert r.json()["description_html"] is None and r.json()["status"] == "draft"
-    assert PUBLIC.get(f"/api/v1/public/treatments/{r.json()['slug']}").status_code == 404
+    assert r.json()["description_html"] is None and r.json()["status"] == "public"
+    public = PUBLIC.get(f"/api/v1/public/treatments/{r.json()['slug']}")
+    assert public.status_code == 200 and public.json()["description_html"] == ""
 
 
 def test_bad_links_are_rejected_with_field_errors(admin_client, db):
@@ -154,9 +155,10 @@ def test_edit_hide_filter_and_delete_treatment(admin_client, db):
     tid = db.scalar(select(Treatment.id).where(Treatment.slug == "coronary-angiography"))
     naik = db.scalar(select(Doctor.id).where(Doctor.slug == "dr-vilas-naik"))
 
-    # Seeded treatments start as drafts.
-    drafts = admin_client.get(f"{A}/treatments", params={"status": "draft"}).json()
-    assert drafts["total"] == 89
+    # Seeded treatments (names only) are all public; there is no "draft" status any more.
+    public = admin_client.get(f"{A}/treatments", params={"status": "public"}).json()
+    assert public["total"] == 89
+    assert admin_client.get(f"{A}/treatments", params={"status": "draft"}).status_code == 422
 
     r = admin_client.put(
         f"{A}/treatments/{tid}",
@@ -390,6 +392,6 @@ def test_dashboard_counts(admin_client, db):
 
     d = admin_client.get(f"{A}/dashboard").json()
     assert d["unread_submissions"] == 1 and d["total_submissions"] == 2
-    assert d["treatments"] == {"total": 89, "public": 1, "draft": 87, "hidden": 1}
+    assert d["treatments"] == {"total": 89, "public": 88, "hidden": 1}
     assert d["doctors"] == {"total": 5, "public": 4, "hidden": 1}
     assert d["departments"] == {"total": 14, "public": 14, "hidden": 0}

@@ -86,7 +86,6 @@ class AdminOut(_Out):
 class TreatmentCounts(BaseModel):
     total: int
     public: int
-    draft: int
     hidden: int
 
 
@@ -230,7 +229,7 @@ class TreatmentIn(_SlugMixin):
     @field_validator("description_html")
     @classmethod
     def _description(cls, v):
-        return clean_html(v)  # None when only empty markup is left, which keeps it a draft
+        return clean_html(v)  # None when only empty markup is left (a treatment without text)
 
     @field_validator("youtube_urls", "presentation_urls")
     @classmethod
@@ -254,7 +253,7 @@ class TreatmentOut(BaseModel):
     presentation_urls: list[str]  # normalised embed links
     doctor_ids: list[int]
     is_hidden: bool
-    status: str  # public | draft | hidden
+    status: str  # public | hidden
     updated_at: datetime
 
 

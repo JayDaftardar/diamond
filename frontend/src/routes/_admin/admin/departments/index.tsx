@@ -1,12 +1,21 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
-import { AdminHead, FormAlert, StatusTag } from '#/components/admin/AdminUi'
+import {
+  AdminHead,
+  EmptyNote,
+  FormAlert,
+  StatusTag,
+  adminRowClass,
+} from '#/components/admin/AdminUi'
+import { buttonClass } from '#/components/ui/button'
 import { adminJson, loadAdmin } from '#/lib/admin'
 import type { Department } from '#/lib/admin'
 import { fmt, m } from '#/lib/i18n'
+import { freshData } from '#/lib/freshData'
 
 export const Route = createFileRoute('/_admin/admin/departments/')({
   ssr: false,
+  ...freshData,
   loader: () => loadAdmin<Array<Department>>('/departments'),
   component: Departments,
 })
@@ -61,26 +70,27 @@ function Departments() {
         title={t.title}
         intro={t.intro}
         action={
-          <Link to="/admin/departments/new" className="btn btn--primary">
+          <Link to="/admin/departments/new" className={buttonClass('primary')}>
             {t.add}
           </Link>
         }
       />
       {error ? <FormAlert title={c.formErrorTitle} text={error} /> : null}
       {items.length === 0 ? (
-        <p className="empty-note">{c.empty}</p>
+        <EmptyNote>{c.empty}</EmptyNote>
       ) : (
-        <ol className="admin-list">
+        <ol className="grid list-none gap-3">
           {items.map((department, index) => (
-            <li key={department.id} className="admin-row">
-              <div className="admin-row__main">
+            <li key={department.id} className={adminRowClass}>
+              <div className="grid min-w-0 flex-1 basis-64 gap-0.5">
                 <Link
                   to="/admin/departments/$id"
                   params={{ id: String(department.id) }}
+                  className="font-semibold text-navy-950 transition-colors hover:text-blue-600"
                 >
                   {department.name}
                 </Link>
-                <span className="muted small">
+                <span className="text-[0.9375rem] text-slate-700">
                   {department.treatment_count === 1
                     ? t.treatmentsOne
                     : fmt(t.treatments, { count: department.treatment_count })}
@@ -89,10 +99,10 @@ function Departments() {
               <StatusTag tone={department.is_hidden ? 'hidden' : 'public'}>
                 {department.is_hidden ? c.hiddenLabel : c.visibleLabel}
               </StatusTag>
-              <div className="admin-row__actions">
+              <div className="flex flex-wrap gap-2">
                 <button
                   type="button"
-                  className="btn btn--quiet"
+                  className={buttonClass('quiet', 'sm')}
                   disabled={busy || index === 0}
                   onClick={() => void move(index, -1)}
                 >
@@ -100,7 +110,7 @@ function Departments() {
                 </button>
                 <button
                   type="button"
-                  className="btn btn--quiet"
+                  className={buttonClass('quiet', 'sm')}
                   disabled={busy || index === items.length - 1}
                   onClick={() => void move(index, 1)}
                 >
@@ -108,7 +118,7 @@ function Departments() {
                 </button>
                 <button
                   type="button"
-                  className="btn btn--quiet"
+                  className={buttonClass('quiet', 'sm')}
                   disabled={busy}
                   onClick={() => void toggle(department)}
                 >

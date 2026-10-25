@@ -1,5 +1,5 @@
 """Public, read-only API (plus the contact form). Everything here goes through
-app.services.visibility, so hidden and draft items can never be returned."""
+app.services.visibility, so hidden items can never be returned."""
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
 from sqlalchemy import func, select
@@ -34,7 +34,12 @@ from app.schemas.public import (
 from app.security.client import client_ip, hash_ip
 from app.services import contact_token, ratelimit, youtube
 from app.services.embeds import safe_presentation_url
-from app.services.visibility import public_departments, public_doctors, public_treatments
+from app.services.visibility import (
+    has_text,
+    public_departments,
+    public_doctors,
+    public_treatments,
+)
 
 router = APIRouter(prefix="/api/v1/public")
 
@@ -280,7 +285,7 @@ def sitemap_entries(db: Session = Depends(get_db)):
             db.execute(
                 select(Treatment.slug, Treatment.updated_at)
                 .join(Department, Treatment.department_id == Department.id)
-                .where(public_treatments())
+                .where(public_treatments(), has_text())  # no text yet: not sent to Google
             )
         ),
     )

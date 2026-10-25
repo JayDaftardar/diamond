@@ -65,8 +65,41 @@ export const HOSPITAL_PHOTOS = {
 export const OG_IMAGE: string | null = null
 
 /**
- * Insurer logo files, by insurer name exactly as written in content/en.ts. Put each file in
- * public/images/insurers/ and add a line like  'Star Health': 'star-health.svg'.
+ * Insurer logo files, by insurer name exactly as written in content/en.ts. The files in
+ * public/images/insurers/ are made from the raw logos in insurer-logos-original/ by
+ * scripts/prepare_insurer_logos.py (it crops empty margins and shrinks them).
+ * To add or replace one: put the raw file in insurer-logos-original/, add it to LOGOS in that
+ * script, run the script (see its header), and list the result here.
  * Insurers without an entry show their name as text.
  */
-export const INSURER_LOGOS: Record<string, string> = {}
+export const INSURER_LOGOS: Record<string, string> = {
+  Acko: 'acko.webp',
+  'Aditya Birla': 'aditya-birla.webp',
+  'Bajaj Allianz': 'bajaj-allianz.webp',
+  'Bharti AXA': 'bharti-axa.webp',
+  'Care Health': 'care-health.webp',
+  'Cholamandalam MS': 'cholamandalam-ms.webp',
+  Digit: 'digit.webp',
+  Edelweiss: 'edelweiss.webp',
+  'Future Generali': 'future-generali.webp',
+  'HDFC ERGO': 'hdfc-ergo.webp',
+  'ICICI Lombard': 'icici-lombard.webp',
+  'IFFCO Tokio': 'iffco-tokio.svg',
+  Kotak: 'kotak.webp',
+  Liberty: 'liberty.webp',
+  ManipalCigna: 'manipal-cigna.webp',
+  'Max Bupa': 'max-bupa.svg',
+  'National Insurance': 'national-insurance.webp',
+  Navi: 'navi.webp',
+  'New India Assurance': 'new-india-assurance.webp',
+  'Oriental Insurance': 'oriental-insurance.svg',
+  'Raheja QBE': 'raheja-qbe.webp',
+  'Reliance General': 'reliance-general.webp',
+  'Royal Sundaram': 'royal-sundaram.webp',
+  'SBI General': 'sbi-general.webp',
+  'Shriram General': 'shriram-general.webp',
+  'Star Health': 'star-health.webp',
+  'Tata AIG': 'tata-aig.webp',
+  'United India': 'united-india.webp',
+  'Universal Sompo': 'universal-sompo.webp',
+}

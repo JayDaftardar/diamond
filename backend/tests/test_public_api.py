@@ -25,11 +25,14 @@ def seeded(db):
     return db
 
 
-def test_drafts_never_appear_anywhere(seeded):
-    assert client.get(f"{API}/treatments").json() == []
-    assert client.get(f"{API}/treatments/coronary-angiography").status_code == 404
+def test_treatments_without_text_are_still_shown(seeded):
+    # Seeded treatments have a name only; they are public all the same.
+    assert len(client.get(f"{API}/treatments").json()) == 89
+    detail = client.get(f"{API}/treatments/coronary-angiography")
+    assert detail.status_code == 200 and detail.json()["description_html"] == ""
     dept = client.get(f"{API}/departments/cardiology").json()
-    assert dept["treatments"] == [] and dept["treatment_count"] == 0
+    assert dept["treatment_count"] == 3 and len(dept["treatments"]) == 3
+    # ...but search engines are only pointed at pages that have text.
     assert client.get(f"{API}/sitemap-entries").json()["treatments"] == []
 
 
@@ -40,17 +43,16 @@ def test_published_treatment_is_visible_and_searchable(seeded):
     assert detail["department"] == {"slug": "cardiology", "name": "Cardiology & CVTS"}
     assert detail["youtube_video_ids"] == ["dQw4w9WgXcQ"]
 
-    assert [t["slug"] for t in client.get(f"{API}/treatments", params={"q": "angio"}).json()] == [
-        "coronary-angiography"
-    ]
+    found = [t["slug"] for t in client.get(f"{API}/treatments", params={"q": "angio"}).json()]
+    assert "coronary-angiography" in found and len(found) > 1  # every treatment is searchable
     assert client.get(f"{API}/treatments", params={"q": "zzz"}).json() == []
-    assert client.get(f"{API}/treatments", params={"department": "ent"}).json() == []
+    assert len(client.get(f"{API}/treatments", params={"department": "ent"}).json()) == 25
 
     listing = client.get(f"{API}/departments").json()
     counts = {d["slug"]: d["treatment_count"] for d in listing}
     doctors = {d["slug"]: d["doctor_names"] for d in listing}
     assert doctors["nephrology"] == ["Dr. Vilas Naik"] and doctors["urology"] == []
-    assert counts["cardiology"] == 1 and counts["ent"] == 0
+    assert counts["cardiology"] == 3 and counts["ent"] == 25
     entries = client.get(f"{API}/sitemap-entries").json()
     assert [e["slug"] for e in entries["treatments"]] == ["coronary-angiography"]
 
