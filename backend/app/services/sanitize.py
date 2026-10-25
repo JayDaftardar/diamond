@@ -12,7 +12,7 @@ MAX_HTML_LENGTH = 50_000
 
 
 def clean_html(html: str | None) -> str | None:
-    """Return safe HTML, or None when nothing visible is left (so the item stays a draft)."""
+    """Return safe HTML, or None when nothing visible is left (so an empty editor saves as no text)."""
     if not html or not html.strip():
         return None
     cleaned = nh3.clean(

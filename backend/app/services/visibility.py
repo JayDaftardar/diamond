@@ -2,8 +2,9 @@
 
 - Department: not hidden.
 - Doctor: not hidden.
-- Treatment: not hidden, has real description text (otherwise it is a draft),
-  and its department is public.
+- Treatment: not hidden, and its department is public. A treatment is shown whether or
+  not it has a description yet; the page says details are being added. (Search engines are
+  only pointed at the ones that have text: see `has_text` and the sitemap.)
 """
 
 import re
@@ -29,7 +30,11 @@ def public_doctors():
 
 
 def has_text():
-    """SQL condition: the description holds visible text once tags and spaces are removed."""
+    """SQL condition: the description holds visible text once tags and spaces are removed.
+
+    Not part of what is public. Used for the sitemap only, so pages with no content yet are
+    not promoted to search engines.
+    """
     stripped = func.trim(
         func.replace(
             func.regexp_replace(func.coalesce(Treatment.description_html, ""), "<[^>]*>", "", "g"),
@@ -42,11 +47,9 @@ def has_text():
 
 def public_treatments():
     """SQL filter for treatments; the query must also join Department."""
-    return and_(Treatment.is_hidden.is_(False), has_text(), Department.is_hidden.is_(False))
+    return and_(Treatment.is_hidden.is_(False), Department.is_hidden.is_(False))
 
 
 def treatment_status(t: Treatment) -> str:
-    """Admin-facing label: hidden | draft | public."""
-    if t.is_hidden:
-        return "hidden"
-    return "public" if has_content(t.description_html) else "draft"
+    """Admin-facing label: hidden | public."""
+    return "hidden" if t.is_hidden else "public"

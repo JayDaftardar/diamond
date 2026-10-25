@@ -32,16 +32,26 @@ export const Route = createFileRoute('/_site/treatments/$slug')({
   head: ({ loaderData: treatment }) => {
     if (!treatment) return {}
     const text = stripHtml(treatment.description_html)
+    // Without text there is little for a search engine to show: describe the page plainly
+    // and keep it out of the index until a description is added.
+    const summary =
+      text ||
+      fmt(m.treatments.metaFallback, {
+        title: treatment.title,
+        department: treatment.department.name,
+        number: EMERGENCY_PHONE.display,
+      })
     return buildHead({
       title: `${fmt(m.treatments.seoTitle, { title: treatment.title })} | ${treatment.department.name}`,
-      description: truncate(text),
+      description: truncate(summary),
+      noindex: !text,
       path: `/treatments/${treatment.slug}`,
       type: 'article',
       jsonLd: [
         procedureJsonLd({
           slug: treatment.slug,
           title: treatment.title,
-          description: truncate(text, 300),
+          description: truncate(summary, 300),
         }),
         breadcrumbJsonLd([
           { name: m.nav.home, path: '/' },
@@ -102,12 +112,24 @@ function TreatmentPage() {
 
       <section aria-label={treatment.title} className="py-14 lg:py-20">
         <Container className="grid items-start gap-12 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-16">
-          {/* Sanitised on the server when the admin saves it. */}
-          <div
-            className={RICHTEXT}
-            data-rise=""
-            dangerouslySetInnerHTML={{ __html: treatment.description_html }}
-          />
+          {treatment.description_html ? (
+            // Sanitised on the server when the admin saves it.
+            <div
+              className={RICHTEXT}
+              data-rise=""
+              dangerouslySetInnerHTML={{ __html: treatment.description_html }}
+            />
+          ) : (
+            <p
+              className="max-w-2xl text-lead text-pretty text-slate-700"
+              data-rise=""
+            >
+              {fmt(m.treatments.noDescription, {
+                title: treatment.title,
+                number,
+              })}
+            </p>
+          )}
 
           <aside className="rounded-2xl bg-blue-50 p-6 lg:sticky lg:top-28">
             <p className="text-eyebrow font-bold text-blue-600 uppercase">

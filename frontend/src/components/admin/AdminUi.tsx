@@ -119,12 +119,11 @@ export function DeleteButton({
 
 const TONES = {
   public: 'bg-blue-50 text-blue-700 ring-blue-600/25',
-  draft: 'bg-slate-100 text-slate-700 ring-slate-300',
   hidden: 'bg-navy-950 text-white ring-navy-950',
   unread: 'bg-blue-600 text-white ring-blue-600',
 }
 
-/** Status pill used in lists: public, draft, hidden, unread. */
+/** Status pill used in lists: public, hidden, unread. */
 export function StatusTag({
   tone,
   children,

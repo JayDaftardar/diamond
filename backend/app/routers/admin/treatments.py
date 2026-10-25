@@ -1,6 +1,6 @@
 """Treatments management: create, edit, hide/show, delete.
 
-A treatment with no real description is a DRAFT and is never shown publicly
+Every treatment is shown on the website unless it is hidden, with or without a description
 (see app.services.visibility).
 """
 
@@ -21,7 +21,7 @@ from app.schemas.admin import (
 )
 from app.services import youtube
 from app.services.slugs import assign_slug, change_slug
-from app.services.visibility import has_text, treatment_status
+from app.services.visibility import treatment_status
 
 router = APIRouter(prefix="/treatments")
 
@@ -84,7 +84,7 @@ def _apply(db: Session, t: Treatment, body: TreatmentIn) -> None:
 def list_treatments(
     q: str | None = Query(None, max_length=100),
     department_id: int | None = None,
-    status: str | None = Query(None, pattern="^(public|draft|hidden)$"),
+    status: str | None = Query(None, pattern="^(public|hidden)$"),
     page: int = Query(1, ge=1),
     page_size: int = Query(50, ge=1, le=200),
     db: Session = Depends(get_db),
@@ -98,9 +98,7 @@ def list_treatments(
     if status == "hidden":
         conditions.append(Treatment.is_hidden.is_(True))
     elif status == "public":
-        conditions += [Treatment.is_hidden.is_(False), has_text()]
-    elif status == "draft":
-        conditions += [Treatment.is_hidden.is_(False), ~has_text()]
+        conditions.append(Treatment.is_hidden.is_(False))
 
     total = db.scalar(select(func.count(Treatment.id)).where(*conditions)) or 0
     rows = db.scalars(

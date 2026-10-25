@@ -19,9 +19,11 @@ import type {
   TreatmentStatus,
 } from '#/lib/admin'
 import { fmt, m } from '#/lib/i18n'
+import { freshData } from '#/lib/freshData'
 
 export const Route = createFileRoute('/_admin/admin/treatments/')({
   ssr: false,
+  ...freshData,
   loader: () => loadAdmin<Array<Department>>('/departments'),
   component: Treatments,
 })
@@ -83,7 +85,6 @@ function Treatments() {
 
   const statusLabel: Record<TreatmentStatus, string> = {
     public: t.statusPublicShort,
-    draft: t.statusDraftShort,
     hidden: t.statusHiddenShort,
   }
   const pages = data ? Math.max(1, Math.ceil(data.total / data.page_size)) : 1
@@ -160,7 +161,6 @@ function Treatments() {
           options={[
             { value: '', label: c.all },
             { value: 'public', label: t.statusPublic },
-            { value: 'draft', label: t.statusDraft },
             { value: 'hidden', label: t.statusHidden },
           ]}
         />

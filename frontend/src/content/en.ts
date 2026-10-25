@@ -376,6 +376,10 @@ export const en = {
     doctors: 'Doctors for this treatment',
     backTo: 'Back to {name}',
     callToAsk: 'To ask about this treatment, call {number}.',
+    noDescription:
+      'Detailed information about {title} is being added. To ask about this treatment, call {number}.',
+    metaFallback:
+      '{title} at Diamond Hospital, Kolhapur, in the {department} department. To ask about this treatment, call {number}.',
     eyebrow: 'Treatment',
     askTitle: 'Have a question about this treatment?',
     department: 'Department',
@@ -487,7 +491,7 @@ export const en = {
       submissions: 'Contact messages',
       unread: '{count} unread',
       treatments: 'Treatments',
-      treatmentsDetail: '{public} public, {draft} draft, {hidden} hidden',
+      treatmentsDetail: '{public} public, {hidden} hidden',
       doctors: 'Doctors',
       departments: 'Departments',
       visibility: '{public} public, {hidden} hidden',
@@ -559,7 +563,7 @@ export const en = {
     treatments: {
       title: 'Treatments',
       intro:
-        'A treatment appears on the website once it has a description and is not hidden.',
+        'Every treatment appears on the website unless it is hidden. One without a description shows a short note that details are being added.',
       add: 'Add treatment',
       newTitle: 'New treatment',
       editTitle: 'Edit treatment',
@@ -567,15 +571,13 @@ export const en = {
       department: 'Department',
       status: 'Status',
       statusPublic: 'Public',
-      statusDraft: 'Draft (no description)',
       statusHidden: 'Hidden',
       statusPublicShort: 'Public',
-      statusDraftShort: 'Draft',
       statusHiddenShort: 'Hidden',
       titleField: 'Title',
       description: 'Description',
       descriptionHint:
-        'Leave empty to keep this treatment as a draft. It will not show on the website until it has text.',
+        'Optional. The treatment shows on the website either way; without text its page says that details are being added.',
       youtube: 'YouTube videos',
       youtubeHint:
         'Paste the full link of each video. Only the video ID is saved. Shown in this order, up to {max}.',

@@ -84,6 +84,6 @@ def test_sanitizer_removes_active_content(payload):
         assert bad not in out.lower()
 
 
-def test_empty_markup_becomes_none_so_the_item_stays_a_draft():
+def test_empty_markup_becomes_none_so_an_empty_editor_saves_as_no_text():
     for empty in (None, "", "   ", "<p></p>", "<p>&nbsp;</p>", "<p><br></p>", "<script>x</script>"):
         assert clean_html(empty) is None

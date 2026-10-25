@@ -4,9 +4,11 @@ import { TreatmentForm } from '#/components/admin/TreatmentForm'
 import { loadAdmin } from '#/lib/admin'
 import type { Department, Doctor } from '#/lib/admin'
 import { m } from '#/lib/i18n'
+import { freshData } from '#/lib/freshData'
 
 export const Route = createFileRoute('/_admin/admin/treatments/new')({
   ssr: false,
+  ...freshData,
   loader: async () => {
     const [departments, doctors] = await Promise.all([
       loadAdmin<Array<Department>>('/departments'),

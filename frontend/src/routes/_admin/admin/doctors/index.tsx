@@ -12,9 +12,11 @@ import { doctorInput } from '#/components/admin/DoctorForm'
 import { adminJson, loadAdmin } from '#/lib/admin'
 import type { Department, Doctor } from '#/lib/admin'
 import { m } from '#/lib/i18n'
+import { freshData } from '#/lib/freshData'
 
 export const Route = createFileRoute('/_admin/admin/doctors/')({
   ssr: false,
+  ...freshData,
   loader: async () => {
     const [doctors, departments] = await Promise.all([
       loadAdmin<Array<Doctor>>('/doctors'),

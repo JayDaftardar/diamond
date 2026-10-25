@@ -13,7 +13,7 @@ export interface AdminUser {
 export interface Dashboard {
   unread_submissions: number
   total_submissions: number
-  treatments: { total: number; public: number; draft: number; hidden: number }
+  treatments: { total: number; public: number; hidden: number }
   doctors: { total: number; public: number; hidden: number }
   departments: { total: number; public: number; hidden: number }
 }
@@ -67,7 +67,7 @@ export interface Doctor {
   updated_at: string
 }
 
-export type TreatmentStatus = 'public' | 'draft' | 'hidden'
+export type TreatmentStatus = 'public' | 'hidden'
 
 export interface TreatmentListItem {
   id: number

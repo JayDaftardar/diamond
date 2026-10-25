@@ -15,11 +15,13 @@ import { fieldControl } from '#/components/ui/field'
 import { adminJson, formatDateTime } from '#/lib/admin'
 import type { Submission, SubmissionPage } from '#/lib/admin'
 import { fmt, m } from '#/lib/i18n'
+import { freshData } from '#/lib/freshData'
 
 type Filter = 'all' | 'unread' | 'read'
 
 export const Route = createFileRoute('/_admin/admin/submissions/')({
   ssr: false,
+  ...freshData,
   component: Messages,
 })
 

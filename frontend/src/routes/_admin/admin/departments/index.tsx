@@ -11,9 +11,11 @@ import { buttonClass } from '#/components/ui/button'
 import { adminJson, loadAdmin } from '#/lib/admin'
 import type { Department } from '#/lib/admin'
 import { fmt, m } from '#/lib/i18n'
+import { freshData } from '#/lib/freshData'
 
 export const Route = createFileRoute('/_admin/admin/departments/')({
   ssr: false,
+  ...freshData,
   loader: () => loadAdmin<Array<Department>>('/departments'),
   component: Departments,
 })

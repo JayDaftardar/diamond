@@ -3,9 +3,11 @@ import { AdminHead, FormAlert } from '#/components/admin/AdminUi'
 import { adminFetch } from '#/lib/admin'
 import type { Dashboard } from '#/lib/admin'
 import { fmt, m } from '#/lib/i18n'
+import { freshData } from '#/lib/freshData'
 
 export const Route = createFileRoute('/_admin/admin/')({
   ssr: false,
+  ...freshData,
   loader: async (): Promise<Dashboard | null> => {
     const response = await adminFetch('/dashboard')
     return response.ok ? ((await response.json()) as Dashboard) : null
@@ -34,7 +36,6 @@ function DashboardPage() {
             value={data.treatments.total}
             detail={fmt(t.treatmentsDetail, {
               public: data.treatments.public,
-              draft: data.treatments.draft,
               hidden: data.treatments.hidden,
             })}
           />

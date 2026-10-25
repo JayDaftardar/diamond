@@ -7,7 +7,6 @@ from sqlalchemy.orm import Session
 from app.db import get_db
 from app.models import ContactSubmission, Department, Doctor, Treatment
 from app.schemas.admin import DashboardOut, TreatmentCounts, VisibilityCounts
-from app.services.visibility import has_text
 
 router = APIRouter(prefix="/dashboard")
 
@@ -33,8 +32,7 @@ def dashboard(db: Session = Depends(get_db)):
         total_submissions=db.scalar(select(func.count(ContactSubmission.id))) or 0,
         treatments=TreatmentCounts(
             total=_count(db),
-            public=_count(db, visible, has_text()),
-            draft=_count(db, visible, ~has_text()),
+            public=_count(db, visible),
             hidden=_count(db, Treatment.is_hidden.is_(True)),
         ),
         doctors=_visibility_counts(db, Doctor),

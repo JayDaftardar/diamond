@@ -109,7 +109,7 @@ class Treatment(TimestampMixin, Base):
     slug: Mapped[str] = mapped_column(String(160), unique=True, index=True)
     title: Mapped[str] = mapped_column(String(200))
     department_id: Mapped[int] = mapped_column(ForeignKey("departments.id"), index=True)
-    # Sanitised on save. Empty/NULL means the treatment is a draft (see services/visibility).
+    # Sanitised on save. Empty/NULL is allowed: the page then says details are being added.
     description_html: Mapped[str | None] = mapped_column(Text)
     # In the order the admin entered them. Only bare 11-character YouTube ids are stored, and
     # presentations as normalised embed links; both are checked again before they are shown.
