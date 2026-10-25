@@ -1,15 +1,24 @@
 import { clsx } from 'clsx'
+import { ArrowDown } from 'lucide-react'
 import { INSURER_LOGOS } from '#/content/config'
-import { m } from '#/lib/i18n'
+import { fmt, m } from '#/lib/i18n'
 
 /**
  * Insurance partners as small tiles. A tile shows the insurer's logo once its file is added
  * to public/images/insurers/ and listed in INSURER_LOGOS (content/config.ts); until then it
  * shows the name on its own. The name is always written under the logo. Logo tiles are white, so
- * a logo with a white background (a JPG, say) sits cleanly on them.
+ * a logo with a white background (a JPG, say) sits cleanly on them. `scroll` puts the tiles in a
+ * fixed-height panel that scrolls (used on the About page, where the full list is long).
  */
-export function InsurerTiles({ className }: { className?: string }) {
-  return (
+export function InsurerTiles({
+  className,
+  scroll,
+}: {
+  className?: string
+  /** Show the tiles in a fixed-height panel that scrolls, with a hint above it. */
+  scroll?: boolean
+}) {
+  const grid = (
     <ul
       className={clsx(
         'grid list-none grid-cols-2 gap-2 sm:grid-cols-3',
@@ -51,5 +60,27 @@ export function InsurerTiles({ className }: { className?: string }) {
         )
       })}
     </ul>
+  )
+
+  if (!scroll) return grid
+
+  return (
+    <div>
+      <p className="mb-4 flex items-center gap-2 text-[0.9375rem] font-semibold text-navy-950">
+        <ArrowDown className="size-4 text-blue-600" aria-hidden="true" />
+        {fmt(m.about.scrollHint, { count: m.insurance.partners.length })}
+      </p>
+      {/* A fixed-height panel that scrolls on its own. It can be reached and scrolled with
+          the keyboard (Tab, then the arrow keys), and it does not pass its scrolling on to the
+          page once it reaches the end. */}
+      <div
+        role="region"
+        aria-label={m.about.scrollRegion}
+        tabIndex={0}
+        className="max-h-[22.5rem] [scrollbar-width:thin] [scrollbar-color:var(--color-blue-600)_var(--color-blue-50)] overflow-y-auto overscroll-contain rounded-xl pr-2"
+      >
+        {grid}
+      </div>
+    </div>
   )
 }

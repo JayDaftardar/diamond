@@ -203,7 +203,7 @@ function About() {
             data-rise=""
             style={rise(2)}
           >
-            <InsurerTiles />
+            <InsurerTiles scroll />
           </div>
         </Container>
       </section>
