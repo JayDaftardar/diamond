@@ -92,6 +92,7 @@ def test_admin_seed_creates_exactly_two_and_hashes(db):
         [("a@x.org", "short"), ("b@x.org", "another-long-password")],
         [("a@x.org", "a-very-long-password"), ("a@x.org", "another-long-password")],
         [("a@x.org", "a-very-long-password"), (None, None)],
+        [],
     ],
 )
 def test_admin_seed_rejects_bad_input(db, accounts):
@@ -103,3 +104,12 @@ def test_admin_seed_refuses_a_third_account(db):
     seed_admins(db, [("a@x.org", "a-very-long-password"), ("b@x.org", "another-long-password")])
     with pytest.raises(SystemExit):
         seed_admins(db, [("a@x.org", "a-very-long-password"), ("c@x.org", "another-long-password")])
+
+
+def test_admin_seed_can_start_with_one_and_add_the_second_later(db):
+    seed_admins(db, [("a@x.org", "a-very-long-password")])
+    assert db.scalar(select(func.count(AdminUser.id))) == 1
+    seed_admins(db, [("b@x.org", "another-long-password")])
+    assert db.scalar(select(func.count(AdminUser.id))) == 2
+    with pytest.raises(SystemExit):
+        seed_admins(db, [("c@x.org", "third-long-password")])
