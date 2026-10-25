@@ -286,7 +286,6 @@ export const en = {
     insuranceIntro:
       'Diamond Hospital supports multiple insurance providers through empanelled TPAs.',
     insuranceCheck: 'To check whether your policy is covered, call {number}.',
-    scrollHint: 'Scroll to see all {count} insurers',
     scrollRegion: 'Insurance partners, a list you can scroll',
     ctaTitle: 'Questions about your visit?',
     ctaBody:

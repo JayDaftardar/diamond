@@ -1,7 +1,6 @@
 import { clsx } from 'clsx'
-import { ArrowDown } from 'lucide-react'
 import { INSURER_LOGOS } from '#/content/config'
-import { fmt, m } from '#/lib/i18n'
+import { m } from '#/lib/i18n'
 
 /**
  * Insurance partners as small tiles. A tile shows the insurer's logo once its file is added
@@ -15,7 +14,7 @@ export function InsurerTiles({
   scroll,
 }: {
   className?: string
-  /** Show the tiles in a fixed-height panel that scrolls, with a hint above it. */
+  /** Show the tiles in a fixed-height panel that scrolls. */
   scroll?: boolean
 }) {
   const grid = (
@@ -64,23 +63,17 @@ export function InsurerTiles({
 
   if (!scroll) return grid
 
+  // A fixed-height panel that scrolls on its own. It ends part-way through a row, so it is
+  // clear there is more. It can be reached and scrolled with the keyboard (Tab, then the
+  // arrow keys), and it does not pass its scrolling on to the page once it reaches the end.
   return (
-    <div>
-      <p className="mb-4 flex items-center gap-2 text-[0.9375rem] font-semibold text-navy-950">
-        <ArrowDown className="size-4 text-blue-600" aria-hidden="true" />
-        {fmt(m.about.scrollHint, { count: m.insurance.partners.length })}
-      </p>
-      {/* A fixed-height panel that scrolls on its own. It can be reached and scrolled with
-          the keyboard (Tab, then the arrow keys), and it does not pass its scrolling on to the
-          page once it reaches the end. */}
-      <div
-        role="region"
-        aria-label={m.about.scrollRegion}
-        tabIndex={0}
-        className="max-h-[22.5rem] [scrollbar-width:thin] [scrollbar-color:var(--color-blue-600)_var(--color-blue-50)] overflow-y-auto overscroll-contain rounded-xl pr-2"
-      >
-        {grid}
-      </div>
+    <div
+      role="region"
+      aria-label={m.about.scrollRegion}
+      tabIndex={0}
+      className="max-h-[24rem] [scrollbar-width:thin] [scrollbar-color:var(--color-blue-600)_var(--color-blue-50)] overflow-y-auto overscroll-contain rounded-xl pr-2"
+    >
+      {grid}
     </div>
   )
 }
