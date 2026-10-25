@@ -9,6 +9,7 @@ import {
   ShieldCheck,
 } from 'lucide-react'
 import type { CSSProperties } from 'react'
+import accentItalic from '@fontsource/source-serif-4/files/source-serif-4-latin-600-italic.woff2?url'
 import { DoctorRow } from '#/components/doctors/DoctorCard'
 import { arrowLinkClass, buttonClass } from '#/components/ui/button'
 import { Closing } from '#/components/ui/Closing'
@@ -38,14 +39,35 @@ export const Route = createFileRoute('/_site/')({
     ])
     return { departments, doctors }
   },
-  head: () =>
-    buildHead({
+  head: () => {
+    const head = buildHead({
       title: m.site.homeTitle,
       fullTitle: true,
       description: m.site.description,
       path: '/',
       jsonLd: [hospitalJsonLd()],
-    }),
+    })
+    return {
+      ...head,
+      links: [
+        ...head.links,
+        // The italic accent word in the hero headline is the only place this font is used,
+        // so only the home page preloads it. (Production only: the dev server would fetch it
+        // twice and warn.)
+        ...(import.meta.env.PROD
+          ? [
+              {
+                rel: 'preload',
+                as: 'font',
+                type: 'font/woff2',
+                href: accentItalic,
+                crossOrigin: 'anonymous' as const,
+              },
+            ]
+          : []),
+      ],
+    }
+  },
   component: Home,
 })
 

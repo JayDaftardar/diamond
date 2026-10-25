@@ -1,7 +1,6 @@
 import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
 import muktaRegular from '@fontsource/mukta/files/mukta-latin-400-normal.woff2?url'
 import domineSemibold from '@fontsource/domine/files/domine-latin-600-normal.woff2?url'
-import accentItalic from '@fontsource/source-serif-4/files/source-serif-4-latin-600-italic.woff2?url'
 import appCss from '../styles/index.css?url'
 import { ErrorPage } from '#/components/ErrorPage'
 import { NotFound } from '#/components/NotFound'
@@ -22,12 +21,12 @@ export const Route = createRootRoute({
     ],
     links: [
       { rel: 'icon', href: '/favicon.svg', type: 'image/svg+xml' },
-      // Preload the fonts of the hero (body text, heading, accent word) so text doesn't jump
+      // Preload the two fonts every page uses (body text and headings) so text doesn't jump
       // when they arrive.
       // Production only: the dev server re-adds these links after hydration, fetching
       // the fonts a second time and logging an "unused preload" warning.
       ...(import.meta.env.PROD
-        ? [muktaRegular, domineSemibold, accentItalic].map((href) => ({
+        ? [muktaRegular, domineSemibold].map((href) => ({
             rel: 'preload',
             as: 'font',
             type: 'font/woff2',

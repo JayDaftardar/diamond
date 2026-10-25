@@ -28,7 +28,6 @@ export function YouTubeEmbed({
           src={`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0`}
           title={label}
           allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
-          allowFullScreen
           referrerPolicy="strict-origin-when-cross-origin"
           className="absolute inset-0 size-full border-0"
         />

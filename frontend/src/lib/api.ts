@@ -5,6 +5,7 @@ import type {
   DoctorCardData,
   DoctorDetail,
   EntityType,
+  SitemapEntries,
   TreatmentDetail,
   TreatmentItem,
 } from '#/lib/types'
@@ -95,3 +96,14 @@ export const fetchRedirect = createServerFn({ method: 'GET' })
     )
     return result?.new_slug ?? null
   })
+
+/**
+ * Everything the sitemap lists. A plain server-side function (not a server function):
+ * only the /sitemap.xml route calls it. Throws when the API cannot be reached, so the
+ * route can say "try again later" instead of publishing an empty sitemap.
+ */
+export async function fetchSitemapEntries(): Promise<SitemapEntries> {
+  const entries = await get<SitemapEntries>('/sitemap-entries')
+  if (!entries) throw new Error('API /sitemap-entries returned nothing')
+  return entries
+}

@@ -61,3 +61,15 @@ export interface TreatmentDetail {
 }
 
 export type EntityType = 'department' | 'doctor' | 'treatment'
+
+/** One page in the sitemap list the API returns. */
+export interface SitemapEntry {
+  slug: string
+  updated_at: string
+}
+
+export interface SitemapEntries {
+  departments: SitemapEntry[]
+  doctors: SitemapEntry[]
+  treatments: SitemapEntry[]
+}
