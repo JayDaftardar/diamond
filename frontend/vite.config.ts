@@ -2,6 +2,8 @@ import { defineConfig, loadEnv } from 'vite'
 
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 
+import { nitro } from 'nitro/vite'
+
 import viteReact from '@vitejs/plugin-react'
 
 import tailwindcss from '@tailwindcss/vite'
@@ -16,6 +18,8 @@ export default defineConfig(({ mode }) => {
 
   return {
     resolve: { tsconfigPaths: true },
-    plugins: [tailwindcss(), tanstackStart(), viteReact()],
+    // nitro() packages the server for the host: on Vercel it detects the build and produces
+    // Vercel's own output, anywhere else a plain Node server (.output/server/index.mjs).
+    plugins: [tailwindcss(), tanstackStart(), nitro(), viteReact()],
   }
 })
